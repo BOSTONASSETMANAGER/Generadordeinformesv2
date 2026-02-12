@@ -1,0 +1,159 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Plus, FileText, Clock, Loader2, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Breadcrumbs } from "@/components/dashboard/Breadcrumbs"
+
+interface Report {
+  id: string
+  name: string
+  category: string
+  status: string
+  created_at: string
+  updated_at: string
+}
+
+export default function ReportsListPage() {
+  const router = useRouter()
+  const [reports, setReports] = useState<Report[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchReports = async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/rb2/reports/list')
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Error al cargar informes')
+        return
+      }
+      setReports(data.reports || [])
+    } catch (err) {
+      setError('Error de conexión al cargar informes')
+      console.error('[reports] Fetch error:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchReports()
+  }, [])
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'draft':
+        return <Badge variant="warning">Borrador</Badge>
+      case 'processing':
+        return <Badge variant="default"><Loader2 className="w-3 h-3 mr-1 animate-spin" />Procesando</Badge>
+      case 'ready':
+        return <Badge variant="success"><CheckCircle2 className="w-3 h-3 mr-1" />Listo</Badge>
+      case 'published':
+        return <Badge variant="success">Publicado</Badge>
+      case 'error':
+        return <Badge variant="danger"><AlertCircle className="w-3 h-3 mr-1" />Error</Badge>
+      default:
+        return <Badge variant="secondary">{status}</Badge>
+    }
+  }
+
+  const formatDate = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
+    } catch {
+      return dateStr
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-[var(--dashboard-bg)]">
+      {/* Header */}
+      <header className="border-b border-[var(--dashboard-border)] bg-[var(--dashboard-surface)]">
+        <div className="max-w-6xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <Breadcrumbs items={[
+              { label: 'Reports' }
+            ]} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-saas-light">Mis Informes</h1>
+              <p className="text-sm text-saas-muted">Gestiona y crea nuevos informes financieros</p>
+            </div>
+            <Button onClick={() => router.push('/app/reports/new')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Informe
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Content */}
+      <main className="max-w-6xl mx-auto px-6 py-8">
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20 text-saas-muted">
+            <Loader2 className="w-8 h-8 animate-spin mb-4" />
+            <p>Cargando informes...</p>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-20 text-saas-muted">
+            <AlertCircle className="w-8 h-8 mb-4 text-red-400" />
+            <p className="text-red-400 mb-4">{error}</p>
+            <Button variant="outline" onClick={fetchReports}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Reintentar
+            </Button>
+          </div>
+        ) : reports.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-saas-muted">
+            <FileText className="w-12 h-12 mb-4 opacity-30" />
+            <p className="text-lg mb-2">No tenés informes todavía</p>
+            <p className="text-sm mb-6">Creá tu primer informe financiero</p>
+            <Button onClick={() => router.push('/app/reports/new')}>
+              <Plus className="w-4 h-4 mr-2" />
+              Nuevo Informe
+            </Button>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {reports.map(report => (
+              <Card 
+                key={report.id}
+                className="p-4 hover:border-saas-accent/50 cursor-pointer transition-colors"
+                onClick={() => router.push(`/app/reports/${report.id}/editor`)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="icon-container">
+                      <FileText className="w-5 h-5 text-saas-accent" />
+                    </div>
+                    <div>
+                      <h3 className="font-medium text-saas-light">{report.name}</h3>
+                      <div className="flex items-center gap-2 text-xs text-saas-muted mt-1">
+                        <Clock className="w-3 h-3" />
+                        {formatDate(report.updated_at)}
+                      </div>
+                    </div>
+                  </div>
+                  {getStatusBadge(report.status)}
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  )
+}

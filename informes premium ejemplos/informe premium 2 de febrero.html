@@ -1,0 +1,663 @@
+<!-- INFORME OPCIONES PREMIUM 2.0 - GGAL -->
+<div class="ggal-premium-report">
+<style>
+body { overflow-x: hidden; }
+
+.ggal-premium-report {
+    --primary: #1d3969;
+    --accent: #2563eb;
+    --light: #f8fafc;
+    --border: #e2e8f0;
+    --text: #374151;
+    --muted: #64748b;
+    --success: #059669;
+    --warning: #f59e0b;
+    --danger: #dc2626;
+    --purple: #7c3aed;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text);
+}
+
+.ggal-premium-report * { margin: 0; padding: 0; box-sizing: border-box; }
+.ggal-premium-report .container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+
+/* Hero */
+.ggal-premium-report .hero { background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); padding: 60px 0 50px; width: 100vw; margin-left: calc(-50vw + 50%); margin-top: -100px; color: white; }
+.ggal-premium-report .hero-content { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
+.ggal-premium-report .back-link { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.9rem; font-weight: 500; margin-bottom: 20px; transition: all 0.2s ease; }
+.ggal-premium-report .back-link:hover { color: white; transform: translateX(-3px); }
+.ggal-premium-report .hero h1 { font-size: 2rem; font-weight: 700; line-height: 1.3; color: white; margin-bottom: 8px; }
+.ggal-premium-report .hero p { font-size: 1rem; opacity: 0.9; color: white; }
+
+/* KPIs */
+.ggal-premium-report .kpis { background: white; padding: 40px 0; width: 100vw; margin-left: calc(-50vw + 50%); border-bottom: 1px solid var(--border); }
+.ggal-premium-report .kpis-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.ggal-premium-report .kpi { display: flex; align-items: flex-start; gap: 15px; padding: 20px; background: var(--light); border-radius: 12px; border: 1px solid var(--border); }
+.ggal-premium-report .kpi.positive { background: linear-gradient(135deg, rgba(5, 150, 105, 0.05), rgba(5, 150, 105, 0.1)); border-color: var(--success); }
+.ggal-premium-report .kpi.negative { background: linear-gradient(135deg, rgba(220, 38, 38, 0.05), rgba(220, 38, 38, 0.1)); border-color: var(--danger); }
+.ggal-premium-report .kpi-icon { width: 44px; height: 44px; background: linear-gradient(135deg, rgba(29, 57, 105, 0.08), rgba(37, 99, 235, 0.08)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0; }
+.ggal-premium-report .kpi-icon.success { background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.15)); color: var(--success); }
+.ggal-premium-report .kpi-icon.danger { background: linear-gradient(135deg, rgba(220, 38, 38, 0.1), rgba(220, 38, 38, 0.15)); color: var(--danger); }
+.ggal-premium-report .kpi-label { font-size: 0.8rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+.ggal-premium-report .kpi-value { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+.ggal-premium-report .kpi-value.success { color: var(--success); }
+.ggal-premium-report .kpi-value.danger { color: var(--danger); }
+
+/* Context */
+.ggal-premium-report .context { background: var(--light); padding: 40px 0; width: 100vw; margin-left: calc(-50vw + 50%); }
+.ggal-premium-report .context-card { background: white; border-radius: 12px; padding: 30px; border-left: 4px solid var(--primary); box-shadow: 0 2px 8px rgba(29, 57, 105, 0.06); }
+.ggal-premium-report .context-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
+.ggal-premium-report .context-icon { width: 40px; height: 40px; background: linear-gradient(135deg, rgba(29, 57, 105, 0.08), rgba(37, 99, 235, 0.08)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary); }
+.ggal-premium-report .context-title { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+.ggal-premium-report .context-card p { font-size: 1rem; line-height: 1.8; color: var(--text); margin-bottom: 15px; }
+.ggal-premium-report .context-card p:last-child { margin-bottom: 0; }
+.ggal-premium-report .context-card strong { color: var(--primary); }
+.ggal-premium-report .context-card ul { margin: 15px 0; padding-left: 25px; }
+.ggal-premium-report .context-card li { margin-bottom: 12px; line-height: 1.7; }
+
+/* Sections */
+.ggal-premium-report .section { padding: 50px 0; width: 100vw; margin-left: calc(-50vw + 50%); }
+.ggal-premium-report .section.white { background: white; }
+.ggal-premium-report .section.light { background: var(--light); }
+.ggal-premium-report .section-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+.ggal-premium-report .section-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; }
+.ggal-premium-report .section-icon.green { background: linear-gradient(135deg, var(--success), #10b981); }
+.ggal-premium-report .section-icon.red { background: linear-gradient(135deg, var(--danger), #ef4444); }
+.ggal-premium-report .section-icon.purple { background: linear-gradient(135deg, var(--purple), #a855f7); }
+.ggal-premium-report .section-icon.orange { background: linear-gradient(135deg, var(--warning), #fb923c); }
+.ggal-premium-report .section-icon.cyan { background: linear-gradient(135deg, #0891b2, #22d3ee); }
+.ggal-premium-report .section-title { font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-bottom: 2px; }
+.ggal-premium-report .section-subtitle { font-size: 0.9rem; color: var(--muted); }
+.ggal-premium-report .section-text { font-size: 1rem; line-height: 1.8; color: var(--text); margin-bottom: 20px; }
+.ggal-premium-report .section-text strong { color: var(--primary); }
+
+/* Analysis Blocks */
+.ggal-premium-report .analysis-block { background: white; border-radius: 16px; padding: 30px; margin-bottom: 25px; box-shadow: 0 4px 12px rgba(29, 57, 105, 0.08); }
+.ggal-premium-report .analysis-header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 2px solid; }
+.ggal-premium-report .analysis-header.calls { border-bottom-color: var(--success); }
+.ggal-premium-report .analysis-header.puts { border-bottom-color: var(--danger); }
+.ggal-premium-report .analysis-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.ggal-premium-report .analysis-header.calls .analysis-icon { background: rgba(5, 150, 105, 0.1); color: var(--success); }
+.ggal-premium-report .analysis-header.puts .analysis-icon { background: rgba(220, 38, 38, 0.1); color: var(--danger); }
+.ggal-premium-report .analysis-header h4 { flex: 1; font-size: 1.1rem; font-weight: 600; color: var(--primary); }
+.ggal-premium-report .analysis-content { font-size: 0.95rem; line-height: 1.8; color: var(--text); }
+.ggal-premium-report .analysis-content p { margin-bottom: 15px; }
+.ggal-premium-report .analysis-content p:last-child { margin-bottom: 0; }
+.ggal-premium-report .analysis-content strong { color: var(--primary); }
+
+/* Tables */
+.ggal-premium-report .table-container { overflow-x: auto; }
+.ggal-premium-report .data-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.ggal-premium-report .data-table thead { background: var(--primary); }
+.ggal-premium-report .data-table th { padding: 14px 16px; text-align: left; color: white; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.3px; }
+.ggal-premium-report .data-table td { padding: 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.ggal-premium-report .data-table tr:last-child td { border-bottom: none; }
+.ggal-premium-report .data-table tr:hover { background: rgba(37, 99, 235, 0.02); }
+.ggal-premium-report .type-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-weight: 600; font-size: 0.8rem; }
+.ggal-premium-report .type-badge.call { background: rgba(5, 150, 105, 0.1); color: var(--success); }
+.ggal-premium-report .type-badge.put { background: rgba(220, 38, 38, 0.1); color: var(--danger); }
+.ggal-premium-report .type-badge.maxpain { background: rgba(124, 58, 237, 0.1); color: var(--purple); }
+.ggal-premium-report .type-badge.otro { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+.ggal-premium-report .strike-tag { display: inline-block; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.85rem; font-family: 'Consolas', monospace; }
+.ggal-premium-report .strike-tag.call { background: rgba(5, 150, 105, 0.1); color: var(--success); }
+.ggal-premium-report .strike-tag.put { background: rgba(220, 38, 38, 0.1); color: var(--danger); }
+.ggal-premium-report .strike-tag.maxpain { background: rgba(124, 58, 237, 0.1); color: var(--purple); }
+.ggal-premium-report .strike-tag.otro { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+.ggal-premium-report .interpretation-cell { font-size: 0.9rem; line-height: 1.6; color: var(--text); max-width: 400px; }
+.ggal-premium-report .text-success { color: var(--success); font-weight: 600; }
+.ggal-premium-report .text-danger { color: var(--danger); font-weight: 600; }
+
+/* Volatility */
+.ggal-premium-report .vol-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-bottom: 25px; }
+.ggal-premium-report .vol-card { background: var(--light); border-radius: 12px; padding: 25px; }
+.ggal-premium-report .vol-card h5 { font-size: 1.1rem; font-weight: 700; color: var(--primary); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+.ggal-premium-report .vol-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.ggal-premium-report .vol-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: top; }
+.ggal-premium-report .vol-table td:first-child { font-weight: 700; color: var(--primary); width: 80px; background: rgba(29, 57, 105, 0.03); border-radius: 6px 0 0 6px; }
+.ggal-premium-report .vol-table td:nth-child(2) { font-weight: 600; color: var(--accent); width: 70px; }
+.ggal-premium-report .vol-table td:last-child { color: var(--text); line-height: 1.6; }
+.ggal-premium-report .vol-table tr:last-child td { border-bottom: none; }
+.ggal-premium-report .verdict-box { background: linear-gradient(135deg, rgba(124, 58, 237, 0.05), rgba(124, 58, 237, 0.1)); border-radius: 12px; padding: 20px; border-left: 4px solid var(--purple); }
+.ggal-premium-report .verdict-box h5 { font-size: 1rem; font-weight: 700; color: var(--purple); margin-bottom: 10px; }
+.ggal-premium-report .verdict-box p { font-size: 0.95rem; line-height: 1.7; color: var(--text); }
+
+/* Ranges */
+.ggal-premium-report .ranges-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.ggal-premium-report .range-card { background: white; border-radius: 12px; padding: 20px; border-top: 4px solid; box-shadow: 0 2px 8px rgba(29, 57, 105, 0.06); }
+.ggal-premium-report .range-card.weekly { border-top-color: var(--accent); }
+.ggal-premium-report .range-card.expiry { border-top-color: var(--success); }
+.ggal-premium-report .range-card.extended { border-top-color: var(--warning); }
+.ggal-premium-report .range-type { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.ggal-premium-report .range-sigma { font-size: 0.85rem; font-weight: 600; color: var(--accent); margin-bottom: 8px; }
+.ggal-premium-report .range-label { font-size: 0.9rem; color: var(--text); font-weight: 500; margin-bottom: 8px; }
+.ggal-premium-report .range-value { font-size: 1.4rem; font-weight: 800; color: var(--primary); margin-bottom: 8px; }
+.ggal-premium-report .range-prob { font-size: 0.9rem; font-weight: 600; color: var(--accent); margin-bottom: 12px; }
+.ggal-premium-report .range-desc { font-size: 0.9rem; line-height: 1.6; color: var(--text); }
+
+/* Strategy */
+.ggal-premium-report .strategy-card { background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 12px rgba(29, 57, 105, 0.08); border-left: 4px solid var(--purple); }
+.ggal-premium-report .strategy-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+.ggal-premium-report .strategy-badge { padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; background: linear-gradient(135deg, var(--purple), #a855f7); color: white; }
+.ggal-premium-report .strategy-header h4 { font-size: 1.2rem; font-weight: 700; color: var(--primary); }
+.ggal-premium-report .strategy-description { background: rgba(37, 99, 235, 0.05); border-radius: 10px; padding: 15px 20px; margin-bottom: 20px; border-left: 3px solid var(--accent); }
+.ggal-premium-report .strategy-description p { font-size: 0.95rem; line-height: 1.7; color: var(--text); margin: 0; }
+.ggal-premium-report .strategy-structure { margin-bottom: 20px; }
+.ggal-premium-report .strategy-structure h5 { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+.ggal-premium-report .structure-content { background: var(--light); border-radius: 10px; padding: 20px; font-size: 0.95rem; line-height: 1.8; }
+.ggal-premium-report .strategy-analysis { background: var(--light); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+.ggal-premium-report .strategy-analysis h5 { font-size: 1rem; font-weight: 700; color: var(--primary); margin-bottom: 15px; }
+.ggal-premium-report .payoff-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 20px; }
+.ggal-premium-report .payoff-item:last-child { border-bottom: none; }
+.ggal-premium-report .payoff-label { font-size: 0.9rem; color: var(--muted); flex-shrink: 0; }
+.ggal-premium-report .payoff-value { font-size: 0.95rem; font-weight: 600; color: var(--primary); text-align: right; }
+.ggal-premium-report .strategy-rationale { background: linear-gradient(135deg, rgba(5, 150, 105, 0.05), rgba(5, 150, 105, 0.1)); border-radius: 12px; padding: 20px; border-left: 4px solid var(--success); }
+.ggal-premium-report .strategy-rationale h5 { font-size: 1rem; font-weight: 700; color: var(--success); margin-bottom: 12px; }
+.ggal-premium-report .strategy-rationale p { font-size: 0.95rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+.ggal-premium-report .strategy-rationale p:last-child { margin-bottom: 0; }
+.ggal-premium-report .strategy-rationale ol { margin: 10px 0; padding-left: 25px; }
+.ggal-premium-report .strategy-rationale li { margin-bottom: 10px; line-height: 1.7; }
+
+/* Conclusion */
+.ggal-premium-report .conclusion { background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); padding: 50px 0; width: 100vw; margin-left: calc(-50vw + 50%); margin-bottom: -120px; color: white; }
+.ggal-premium-report .conclusion-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 16px; padding: 35px; border: 1px solid rgba(255,255,255,0.2); }
+.ggal-premium-report .conclusion h2 { font-size: 1.4rem; font-weight: 700; color: white; margin-bottom: 20px; }
+.ggal-premium-report .conclusion-text { font-size: 1rem; line-height: 1.8; color: rgba(255,255,255,0.95); margin-bottom: 25px; }
+.ggal-premium-report .conclusion-text ul { margin: 15px 0; padding-left: 25px; }
+.ggal-premium-report .conclusion-text li { margin-bottom: 10px; }
+.ggal-premium-report .levels-box { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 25px; }
+.ggal-premium-report .levels-box h5 { font-size: 1rem; font-weight: 700; color: white; margin-bottom: 15px; }
+.ggal-premium-report .levels-content { font-size: 0.95rem; line-height: 1.8; color: rgba(255,255,255,0.9); }
+.ggal-premium-report .action-plan-box { background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; margin-bottom: 25px; }
+.ggal-premium-report .action-plan-box h5 { font-size: 1rem; font-weight: 700; color: white; margin-bottom: 15px; }
+.ggal-premium-report .action-list { margin: 0; padding-left: 20px; color: rgba(255,255,255,0.95); }
+.ggal-premium-report .action-list li { font-size: 0.95rem; line-height: 1.8; margin-bottom: 10px; }
+.ggal-premium-report .action-list li:last-child { margin-bottom: 0; }
+.ggal-premium-report .verdict-final { background: rgba(255,255,255,0.15); border-radius: 12px; padding: 20px; }
+.ggal-premium-report .verdict-final h5 { font-size: 1rem; font-weight: 700; color: white; margin-bottom: 12px; }
+.ggal-premium-report .verdict-final p { font-size: 0.95rem; line-height: 1.8; color: rgba(255,255,255,0.95); }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .ggal-premium-report .kpis-grid { grid-template-columns: repeat(2, 1fr); }
+    .ggal-premium-report .vol-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+    .ggal-premium-report .hero { padding: 50px 0 40px; }
+    .ggal-premium-report .hero h1 { font-size: 1.5rem; }
+    .ggal-premium-report .kpis-grid { grid-template-columns: 1fr; }
+    .ggal-premium-report .container { padding: 0 20px; }
+    .ggal-premium-report .ranges-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <a href="https://bostonam.ar/001-2/" class="back-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Volver a Informes
+            </a>
+            <h1>Análisis Cuantitativo y Estratégico de Derivados Financieros – (GGAL)</h1>
+            <p>Período de Análisis: Semana del 26 al 30 de Enero de 2026</p>
+        </div>
+    </section>
+
+    <!-- KPIs Section -->
+    <section class="kpis">
+        <div class="container">
+            <div class="kpis-grid">
+                <div class="kpi">
+                    <div class="kpi-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <div>
+                        <span class="kpi-label">Período de Análisis</span>
+                        <div class="kpi-value">26 al 30 Enero 2026</div>
+                    </div>
+                </div>
+                
+                <div class="kpi">
+                    <div class="kpi-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <div>
+                        <span class="kpi-label">Activo Subyacente</span>
+                        <div class="kpi-value">Grupo Financiero Galicia (GGAL)</div>
+                    </div>
+                </div>
+                
+                <div class="kpi">
+                    <div class="kpi-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    </div>
+                    <div>
+                        <span class="kpi-label">Precio Spot Cierre</span>
+                        <div class="kpi-value">$8.310 (0%)</div>
+                    </div>
+                </div>
+
+                <div class="kpi">
+                    <div class="kpi-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <div>
+                        <span class="kpi-label">ADR Cierre</span>
+                        <div class="kpi-value">USD 55,11</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección PRE: Contexto Macro y Drivers Exógenos -->
+    <section class="context">
+        <div class="container">
+            <div class="context-card">
+                <div class="context-header">
+                    <div class="context-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    </div>
+                    <h2 class="context-title">SECCIÓN PRE: CONTEXTO MACRO Y DRIVERS EXÓGENOS</h2>
+                </div>
+                <p>La microestructura del mercado de Grupo Financiero Galicia durante la última semana de enero de 2026 no puede disociarse de un ecosistema macroeconómico que transiciona hacia la estabilización de variables nominales. El comportamiento del activo ha sido influenciado por vectores de política monetaria del Banco Central de la República Argentina (BCRA) y un escenario de incertidumbre fiscal en los Estados Unidos que impactó directamente en la paridad del ADR.</p>
+                
+                <ul>
+                    <li><strong>Desinflación y Tasas:</strong> La inflación de diciembre de 2025 se situó en el 2,8% mensual, con una expectativa anual para 2026 (REM) que desciende al 20,1%. El BCRA ha comenzado a difundir la Tasa de Intereses Moratorios (TIM) a partir del 8 de enero, marcando un nuevo estándar para el costo del dinero en procesos judiciales. La tasa BADLAR en pesos de bancos privados cerró en 30,19% TNA, lo que establece el piso para el costo de fondeo bancario.</li>
+                    <li><strong>Régimen Cambiario 2026:</strong> A partir de enero, el BCRA implementó un ajuste del dólar ligado a la inflación proyectada, buscando acumular reservas por hasta USD 17.000 millones. Las bandas cambiarias para el 30 de enero se fijaron entre $894,10 (límite inferior) y $1.563,51 (límite superior).</li>
+                    <li><strong>Incertidumbre en EE. UU.:</strong> El riesgo de un cierre parcial del gobierno ("shutdown") en Washington generó una toma de ganancias en activos emergentes el viernes 30, presionando al ADR de Galicia desde máximos semanales de USD 56,77 hacia el cierre de USD 55,11.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN A: INSIGHTS DE FLUJO Y ACTIVIDAD -->
+    <section class="section white">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon green">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                </div>
+                <div>
+                    <h2 class="section-title">SECCIÓN A: INSIGHTS DE FLUJO Y ACTIVIDAD</h2>
+                    <p class="section-subtitle">Análisis de la matriz de opciones de febrero</p>
+                </div>
+            </div>
+
+            <div class="section-text" style="margin-bottom: 25px;">
+                <p>El flujo de órdenes en la matriz de opciones de febrero revela un mercado que, a pesar de los precios récord en pesos, comienza a mostrar <strong>signos de fatiga en la demanda de calls OTM</strong> y un <strong>incremento táctico en la demanda de protección</strong>.</p>
+            </div>
+
+            <div class="section-header" style="margin-top: 30px;">
+                <div class="section-icon orange">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                </div>
+                <div>
+                    <h2 class="section-title">1. Mapa de Calor (Volumen)</h2>
+                    <p class="section-subtitle">Actividad concentrada en el ejercicio de febrero (vencimiento 20/02/2026)</p>
+                </div>
+            </div>
+
+            <div class="section-text">
+                <p>La actividad de la semana se concentró masivamente en el ejercicio de febrero (vencimiento 20/02/2026), con una <strong>dominancia absoluta de las estrategias de compra (Calls) sobre las de venta (Puts)</strong>, aunque con una segmentación clara por niveles de convicción.</p>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tipo de Contrato</th>
+                            <th>Strike</th>
+                            <th>Volumen Nominal (ARS)</th>
+                            <th>Contratos (Nominal Volume)</th>
+                            <th>Interpretación del Flujo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="type-badge call">CALL</span></td>
+                            <td><span class="strike-tag call">GFGC8530FE</span></td>
+                            <td>$1.194.593.557</td>
+                            <td>60.363</td>
+                            <td class="interpretation-cell"><strong>Especulación Agresiva:</strong> Máxima actividad semanal. Apuesta al quiebre de la resistencia de $8.500.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge call">CALL</span></td>
+                            <td><span class="strike-tag call">GFGC7930FE</span></td>
+                            <td>$552.211.442</td>
+                            <td>9.821</td>
+                            <td class="interpretation-cell"><strong>Rotación / Toma de Ganancias:</strong> Cierre de posiciones ITM para liberar capital.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge call">CALL</span></td>
+                            <td><span class="strike-tag call">GFGC8230FE</span></td>
+                            <td>$288.718.712</td>
+                            <td>8.125</td>
+                            <td class="interpretation-cell"><strong>Posicionamiento ATM:</strong> Operadores buscando delta puro frente al movimiento del spot.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge put">PUT</span></td>
+                            <td><span class="strike-tag put">GFGV8530FE</span></td>
+                            <td>$147.427.801</td>
+                            <td>4.592</td>
+                            <td class="interpretation-cell"><strong>Cobertura Premium:</strong> Institucionales pagando por proteger el valor del papel en máximos.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="type-badge put">PUT</span></td>
+                            <td><span class="strike-tag put">GFGV7930FE</span></td>
+                            <td>$124.391.831</td>
+                            <td>13.956</td>
+                            <td class="interpretation-cell"><strong>Suelo de Hierro:</strong> Gran volumen de lanzamiento de puts, sugiriendo que $7.900 es el piso del mercado.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="analysis-block" style="margin-top: 25px;">
+                <div class="analysis-header calls">
+                    <div class="analysis-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
+                    </div>
+                    <h4>Interpretación Rápida:</h4>
+                </div>
+                <div class="analysis-content">
+                    <p><strong>Calls:</strong> El flujo es predominantemente especulativo en la base 8530. La caída del precio del call (-3,57% en el día) a pesar de un spot estable indica una compresión de volatilidad y erosión de Theta.</p>
+                    <p><strong>Puts:</strong> La actividad en la base 7930 refleja un comportamiento de "escudo". Los lanzadores de puts están dispuestos a quedarse con el papel en ese nivel, lo que históricamente ha funcionado como un soporte dinámico muy fuerte.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Imanes de Precio -->
+    <section class="section light">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon orange">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                </div>
+                <div>
+                    <h2 class="section-title">2. Imanes de Precio (Open Interest - OI)</h2>
+                    <p class="section-subtitle">Geografía donde los lanzadores tienen mayor exposición</p>
+                </div>
+            </div>
+            
+            <p class="section-text">El Interés Abierto (OI) configura la geografía donde los lanzadores tienen mayor exposición y, por ende, donde se espera la mayor defensa de precios.</p>
+            
+            <div class="analysis-block">
+                <div class="analysis-content">
+                    <p><strong>Murallas de Resistencia (Call Wall):</strong> Se observa una densa acumulación en la zona de <strong>$8.530 - $8.870</strong>. El volumen nominal en estas bases indica que los lanzadores están testeando la capacidad del mercado para sostener precios por encima de los $8.500. Si el papel no logra superar con fuerza los $8.600 en las primeras ruedas de la próxima semana, el efecto de "pinning" atraerá el precio hacia los $8.300 para dejar estas opciones fuera del dinero (OTM).</p>
+                    <p><strong>Zonas de Soporte (Put Wall):</strong> La base 7930 actúa como el imán principal a la baja. Con casi 14.000 contratos negociados en una sola jornada, representa el nivel de "máximo dolor" invertido; los compradores de puts difícilmente logren que el papel perfore ese nivel sin un driver macro negativo de gran magnitud.</p>
+                    <p><strong>Área de Equilibrio:</strong> El rango de <strong>$8.230 a $8.385</strong> (rango diario del 30/01) se ha convertido en la zona neutra donde el Open Interest de calls y puts se equilibra, sugiriendo una lateralización de corto plazo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN B: MÉTRICAS CUANTITATIVAS -->
+    <section class="section white">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon red">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <div>
+                    <h2 class="section-title">SECCIÓN B: MÉTRICAS CUANTITATIVAS</h2>
+                    <p class="section-subtitle">Motor matemático de GGAL</p>
+                </div>
+            </div>
+
+            <div class="section-text" style="margin-bottom: 25px;">
+                <p>Esta sección disecciona el motor matemático de GGAL, utilizando los datos de volatilidad histórica (HV) y los datos extraídos de la matriz de opciones.</p>
+            </div>
+
+            <div class="section-header" style="margin-top: 30px;">
+                <div class="section-icon cyan">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                </div>
+                <div>
+                    <h2 class="section-title">1. Diagnóstico de Volatilidad (IV vs HV)</h2>
+                    <p class="section-subtitle">Arbitraje central para el trader de opciones</p>
+                </div>
+            </div>
+
+            <p class="section-text">La volatilidad es el arbitraje central para el trader de opciones. En el actual régimen de mercado, observamos una <strong>convergencia notable hacia la estabilidad</strong>.</p>
+
+            <div class="vol-grid">
+                <div class="vol-card">
+                    <h5>Volatilidad Histórica (HV)</h5>
+                    <table class="vol-table">
+                        <tr>
+                            <td>HV (3d)</td>
+                            <td>20,06%</td>
+                            <td>Volatilidad de muy corto plazo extremadamente baja. Indica calma absoluta en las últimas 3 ruedas.</td>
+                        </tr>
+                        <tr>
+                            <td>HV (5d)</td>
+                            <td>24,78%</td>
+                            <td>Sigue en niveles contenidos. El mercado no ha experimentado movimientos bruscos en la semana.</td>
+                        </tr>
+                        <tr>
+                            <td>HV (10d)</td>
+                            <td>30,30%</td>
+                            <td>Comienza a reflejar algo más de actividad, pero aún por debajo de la media histórica.</td>
+                        </tr>
+                        <tr>
+                            <td>HV (20d)</td>
+                            <td>33,73%</td>
+                            <td><strong>Referencia clave.</strong> Es el benchmark para comparar con la IV ATM actual.</td>
+                        </tr>
+                        <tr>
+                            <td>HV (60d)</td>
+                            <td>49,38%</td>
+                            <td>Refleja la volatilidad explosiva de meses anteriores. El mercado ya "limpió" ese ruido.</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="vol-card">
+                    <h5>Volatilidad Implícita (IV) ATM</h5>
+                    <table class="vol-table">
+                        <tr>
+                            <td>Base Call 8230</td>
+                            <td>34,38%</td>
+                            <td>IV del Call ATM. Ligeramente por encima de HV20, sugiere leve sobreprecio en calls.</td>
+                        </tr>
+                        <tr>
+                            <td>Base Put 8230</td>
+                            <td>34,67%</td>
+                            <td>IV del Put ATM. Prácticamente igual al Call, indicando equilibrio en la demanda ATM.</td>
+                        </tr>
+                        <tr>
+                            <td>Promedio IV ATM</td>
+                            <td>34,52%</td>
+                            <td><strong>Dato central.</strong> Apenas +0,79% sobre HV20. Opciones en precio justo (Fair Value).</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="verdict-box">
+                <h5>Veredicto</h5>
+                <p>La IV (34,5%) está operando en línea con la HV de 20 días (33,7%), pero <strong>significativamente por debajo de la HV de 60 días (49,4%)</strong>. Esto indica que el mercado ya ha descontado la "limpieza" de la volatilidad explosiva de meses anteriores. Las opciones están en <strong>Precio Justo (Fair Value)</strong>. No hay un "regalo" estadístico para comprar volatilidad, pero la estabilidad de la IV favorece la <strong>venta de Theta</strong> (tiempo) para capturar la prima de riesgo.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lectura del Skew -->
+    <section class="section light">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon purple">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20h20"/><path d="M5 20v-4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v4"/></svg>
+                </div>
+                <div>
+                    <h2 class="section-title">2. Lectura del Skew (Sonrisa de Volatilidad)</h2>
+                    <p class="section-subtitle">Qué teme el mercado: caída rápida o subida explosiva</p>
+                </div>
+            </div>
+
+            <p class="section-text">El sesgo de volatilidad nos dice qué teme el mercado: una caída rápida o una subida explosiva.</p>
+
+            <div class="table-container" style="margin-bottom: 25px;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Strike OTM</th>
+                            <th>Tipo</th>
+                            <th>Last VI (%)</th>
+                            <th>Diferencial vs ATM</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>9176.1</strong></td>
+                            <td>Call</td>
+                            <td>35,42%</td>
+                            <td class="text-success">+0,90%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7152.8</strong></td>
+                            <td>Put</td>
+                            <td>39,78%</td>
+                            <td class="text-danger">+5,26%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="analysis-block">
+                <div class="analysis-content">
+                    <p><strong>Análisis Visual del Skew:</strong> Existe un <strong>Skew de Miedo (Downside Skew)</strong>. Los operadores están dispuestos a pagar una prima de volatilidad mucho mayor (39,78%) por protegerse de una caída de $1.100 pesos (Base 7152) que la que pagan por apostar a una subida de la misma magnitud (Base 9176, VI 35,42%). Esto es típico de un mercado que se encuentra en máximos históricos: los inversores están "comprados" en papel y demandan seguros (Puts) ante una posible toma de ganancias masiva.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rangos Probabilísticos -->
+    <section class="section white">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon cyan">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                </div>
+                <div>
+                    <h2 class="section-title">3. Rangos Probabilísticos</h2>
+                    <p class="section-subtitle">Modelo de desvío estándar para el cierre de la próxima semana y vencimiento de febrero</p>
+                </div>
+            </div>
+
+            <p class="section-text">Cálculos basados en el modelo de desvío estándar para el cierre de la próxima semana y el vencimiento de febrero.</p>
+
+            <div class="table-container" style="margin-bottom: 25px;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Plazo</th>
+                            <th>Rango Esperado (1 Desvío Estándar - 68%)</th>
+                            <th>Rango Extendido (2 Desvíos Estándar - 95%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>7 Días (06/02)</strong></td>
+                            <td>$7.940,50 - $8.679,50</td>
+                            <td>$7.571,00 - $9.049,00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>20 Días (Vencimiento)</strong></td>
+                            <td>$7.660,00 - $8.960,00</td>
+                            <td>$7.010,00 - $9.610,00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="verdict-box">
+                <h5>Nota Técnica</h5>
+                <p>La probabilidad de que GGAL supere los $9.000 para el vencimiento de febrero es <strong>estadísticamente inferior al 16%</strong> bajo las condiciones actuales de volatilidad.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN C: IDEA DE TRADING -->
+    <section class="section light">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon purple">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                </div>
+                <div>
+                    <h2 class="section-title">SECCIÓN C: IDEA DE TRADING</h2>
+                    <p class="section-subtitle">Estrategia de generación de ingresos neutral-alcista</p>
+                </div>
+            </div>
+
+            <p class="section-text">Dada la estructura de la matriz, la compresión de volatilidad y el Skew observado, la oportunidad más clara matemáticamente para los próximos 7 a 15 días es una estrategia de generación de ingresos neutral-alcista.</p>
+
+            <div class="strategy-card">
+                <div class="strategy-header">
+                    <div class="strategy-badge">Estrategia Sugerida</div>
+                    <h4>Bull Put Spread (Spread de Crédito de Venta)</h4>
+                </div>
+                
+                <div class="strategy-structure">
+                    <h5>Estructura Sugerida:</h5>
+                    <div class="structure-content">
+                        <p><strong>VENDER (-):</strong> Put GFGV7930FE @ $82,80 - $85,90</p>
+                        <p><strong>COMPRAR (+):</strong> Put GFGV7530FF @ $30,00 - $32,66</p>
+                        <p><strong>Crédito Neto Esperado:</strong> $53,00 por acción aprox.</p>
+                    </div>
+                </div>
+
+                <div class="strategy-rationale">
+                    <h5>Racional Estratégico:</h5>
+                    <ol>
+                        <li><strong>Soporte de OI:</strong> Como se analizó en la Sección A, la base 7930 tiene el mayor volumen de cobertura. Actúa como una barrera psicológica y técnica muy fuerte.</li>
+                        <li><strong>Aprovechamiento del Skew:</strong> Estamos vendiendo una IV del 35-37% en la pata corta. El mercado está sobreestimando la probabilidad de una caída por debajo de $7.930.</li>
+                        <li><strong>Theta Positivo:</strong> Con 20 días al vencimiento, el decaimiento temporal juega a favor del lanzador. Cada día que el papel se mantenga por encima de $8.300, el spread perderá valor de mercado, permitiendo una recompra barata.</li>
+                        <li><strong>Convergencia ADR/Local:</strong> Si bien el ADR mostró debilidad (USD 55,11), el soporte en $8.210 local ha demostrado ser resiliente debido a la demanda de activos locales como cobertura cambiaria.</li>
+                    </ol>
+                </div>
+
+                <div class="strategy-analysis">
+                    <h5>Métricas de la Operación:</h5>
+                    <div class="payoff-item">
+                        <span class="payoff-label">Riesgo Máximo</span>
+                        <span class="payoff-value">$347 por acción (Diferencial de strikes minus crédito)</span>
+                    </div>
+                    <div class="payoff-item">
+                        <span class="payoff-label">Break-even</span>
+                        <span class="payoff-value">$7.877 (7% por debajo del precio actual)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN D: CONCLUSIÓN -->
+    <section class="conclusion">
+        <div class="container">
+            <div class="conclusion-card">
+                <h2>SECCIÓN D: CONCLUSIÓN RÁPIDA Y CONCISA</h2>
+                
+                <div class="conclusion-text">
+                    <p>La bitácora de datos del 30 de enero de 2026 confirma que GGAL ha entrado en una fase de "maduración de tendencia".</p>
+                    <ul>
+                        <li><strong>Precio Spot:</strong> $8.310,00.</li>
+                        <li><strong>Volatilidad:</strong> IV (34%) alineada con HV20 (33%). Fin de la prima por pánico.</li>
+                        <li><strong>Sentimiento:</strong> Cautela profesional. El alto volumen en la base Call 8530 sugiere un último intento de rally, pero el Skew de Puts advierte que el costo de protección es alto.</li>
+                        <li><strong>Nivel Clave Semanal:</strong> $8.530 es la resistencia a quebrar. De no hacerlo en las primeras 48hs de la próxima semana, el sesgo será de goteo lateral hacia los $8.100.</li>
+                    </ul>
+                </div>
+
+                <div class="verdict-final">
+                    <h5>Veredicto Final</h5>
+                    <p>El tiempo es hoy el mejor aliado del inversor en GGAL, dado que la probabilidad de movimientos explosivos superiores al 10% en cualquier dirección se ha reducido drásticamente según las métricas de HV de corto plazo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
+<!-- FIN INFORME OPCIONES PREMIUM 2.0 -->

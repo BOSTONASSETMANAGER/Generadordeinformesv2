@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* UI Kit - Variables obligatorias */
+  --saas-primary: #1d3969;
+  --saas-accent: #2563eb;
+  --saas-light: #f8fafc;
+  --saas-border: #e2e8f0;
+  --saas-text: #374151;
+  --saas-muted: #64748b;
+  --saas-success: #059669;
+  
+  /* Extensiones para dashboard (danger/warning) */
+  --saas-danger: #dc2626;
+  --saas-warning: #d97706;
+  
+  /* Dark mode base colors */
+  --dashboard-bg: #0f1419;
+  --dashboard-surface: #1a1f2e;
+  --dashboard-surface-elevated: #242938;
+  --dashboard-border: rgba(226, 232, 240, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background: var(--dashboard-bg);
+  color: var(--saas-light);
+}
+
+/* Scrollbar styling for dark mode */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dashboard-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--saas-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--saas-accent);
+}
+
+/* Utility classes for UI kit */
+.bg-saas-gradient {
+  background: linear-gradient(135deg, var(--saas-primary), var(--saas-accent));
+}
+
+.icon-container {
+  background: linear-gradient(135deg, rgba(29, 57, 105, 0.3), rgba(37, 99, 235, 0.3));
+  border-radius: 8px;
+  padding: 8px;
+}
+
+/* Card base styles */
+.card-dark {
+  background: var(--dashboard-surface);
+  border: 1px solid var(--dashboard-border);
+  border-radius: 12px;
+}
+
+.card-dark-elevated {
+  background: var(--dashboard-surface-elevated);
+  border: 1px solid var(--dashboard-border);
+  border-radius: 12px;
+}
