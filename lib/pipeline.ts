@@ -375,12 +375,24 @@ export async function runPipeline(
 
     if (input.pdfBase64) {
       console.log(`[pipeline] Step 0: Converting base64 PDF to page images (scale=1.0, ALL pages)...`)
-      const pdfBuffer = Buffer.from(input.pdfBase64, 'base64')
-      pageImages = await convertPdfToImages(pdfBuffer, { scale: 1.0 })
+      try {
+        const pdfBuffer = Buffer.from(input.pdfBase64, 'base64')
+        pageImages = await convertPdfToImages(pdfBuffer, { scale: 1.0 })
+      } catch (pdfErr) {
+        const pdfErrMsg = pdfErr instanceof Error ? pdfErr.message : String(pdfErr)
+        console.warn(`[pipeline] Step 0: PDF-to-images failed (${pdfErrMsg}) — falling back to text-only mode`)
+        warnings.push(`pdf_to_images_failed: ${pdfErrMsg}`)
+      }
     } else if (input.sourceFileUrl) {
       console.log(`[pipeline] Step 0: Downloading PDF and converting to page images (scale=1.0, ALL pages)...`)
-      const pdfBuffer = await downloadPdfAsBuffer(input.sourceFileUrl)
-      pageImages = await convertPdfToImages(pdfBuffer, { scale: 1.0 })
+      try {
+        const pdfBuffer = await downloadPdfAsBuffer(input.sourceFileUrl)
+        pageImages = await convertPdfToImages(pdfBuffer, { scale: 1.0 })
+      } catch (pdfErr) {
+        const pdfErrMsg = pdfErr instanceof Error ? pdfErr.message : String(pdfErr)
+        console.warn(`[pipeline] Step 0: PDF download/conversion failed (${pdfErrMsg}) — falling back to text-only mode`)
+        warnings.push(`pdf_to_images_failed: ${pdfErrMsg}`)
+      }
     } else {
       console.log(`[pipeline] Step 0: No PDF file available — text-only mode`)
     }
