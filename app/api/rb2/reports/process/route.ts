@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
     const userId = user.id
     const sourceId = sources?.[0]?.id || null
 
-    console.log(`[process] Starting pipeline for report ${reportId}`)
+    console.log(`[process] Starting pipeline for report ${reportId}, textContent length=${textContent.length}, hasPdfBase64=${!!pdfBase64}, sourceFileUrl=${sources?.[0]?.file_url ? 'yes' : 'no'}, sourceFileName=${sourceFileName}`)
 
     try {
       const pipelineResult = await runPipeline(
@@ -258,7 +258,26 @@ export async function POST(request: NextRequest) {
 
     } catch (pipelineError) {
       const errMsg = pipelineError instanceof Error ? pipelineError.message : String(pipelineError)
+      const errStack = pipelineError instanceof Error ? pipelineError.stack : undefined
       console.error(`[process] Pipeline failed for ${reportId}: ${errMsg}`)
+      if (errStack) console.error(`[process] Stack trace: ${errStack}`)
+
+      // Save error details to a version row for remote diagnosis
+      try {
+        await rb2
+          .from('report_versions')
+          .insert({
+            report_id: reportId,
+            user_id: userId,
+            version_number: currentVersion,
+            html_content: '',
+            report_data: {},
+            warnings: [`pipeline_crash: ${errMsg}`],
+            meta: { error_message: errMsg, error_stack: errStack || null, pipeline_crashed: true },
+          })
+      } catch (saveErr) {
+        console.error('[process] Failed to save error version:', saveErr)
+      }
 
       // Mark report as error in DB
       await rb2
@@ -270,6 +289,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         status: 'error',
         reportId,
+        success: false,
         error: errMsg,
       })
     }
