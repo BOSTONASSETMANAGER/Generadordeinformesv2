@@ -312,7 +312,6 @@ export default function ReportEditorPage() {
 
       console.log('[editor] Pipeline fired, starting poll...', result)
       if (result.error) console.error('[editor] Pipeline error:', result.error)
-      if (result._checkpoints) console.log('[editor] Checkpoints:', result._checkpoints)
 
       // If server already returned error status, show it immediately
       if (result.status === 'error') {
