@@ -23,11 +23,16 @@ export const maxDuration = 300
  */
 
 export async function POST(request: NextRequest) {
+  const checkpoints: string[] = []
   try {
+    checkpoints.push('start')
     const supabase = createServerClient()
+    checkpoints.push('supabase_created')
     const rb2 = (supabase as any).schema('rb2')
+    checkpoints.push('rb2_schema')
     
     const body = await request.json()
+    checkpoints.push(`body_parsed: keys=${Object.keys(body).join(',')}, pdfTextContent_len=${body.pdfTextContent?.length || 0}, pdfBase64_len=${body.pdfBase64?.length || 0}`)
     const { reportId, pdfTextContent, pdfBase64 } = body
 
     if (!reportId) {
@@ -140,6 +145,7 @@ export async function POST(request: NextRequest) {
     const userId = user.id
     const sourceId = sources?.[0]?.id || null
 
+    checkpoints.push(`pre_pipeline: textContent_len=${textContent.length}, hasPdfBase64=${!!pdfBase64}, sourceFileUrl=${sources?.[0]?.file_url ? 'yes' : 'no'}`)
     console.log(`[process] Starting pipeline for report ${reportId}, textContent length=${textContent.length}, hasPdfBase64=${!!pdfBase64}, sourceFileUrl=${sources?.[0]?.file_url ? 'yes' : 'no'}, sourceFileName=${sourceFileName}`)
 
     try {
@@ -291,12 +297,13 @@ export async function POST(request: NextRequest) {
         reportId,
         success: false,
         error: errMsg,
+        _checkpoints: checkpoints,
       })
     }
   } catch (error) {
     console.error('[process] Unhandled error:', error)
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error), _checkpoints: checkpoints },
       { status: 500 }
     )
   }
