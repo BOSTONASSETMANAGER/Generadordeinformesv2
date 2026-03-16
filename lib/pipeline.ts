@@ -8,8 +8,6 @@
  * Step 5: Similarity scorer + anti-layout-inventado validation
  */
 
-import fs from 'fs'
-import path from 'path'
 import crypto from 'crypto'
 import OpenAI from 'openai'
 import { selectTemplate, selectTemplateWithGolden, getTemplateFileNames } from './template-loader'
@@ -28,10 +26,11 @@ import type { TemplateSelection, TemplateSelectionResult } from './template-load
 import type { SimilarityResult } from './template-similarity'
 import type { TemplateValidationResult } from './template-validation'
 
-// Prompt file paths (relative to project root)
-const PROMPT_EXTRACTOR = 'ai/prompts/openai/extract-premium-from-pdf.md'
-const PROMPT_JSON_CONTRACTS = 'ai/prompts/shared/json-contracts.md'
-const PROMPT_RULES_LITERAL = 'ai/prompts/shared/rules-literal-content.md'
+import {
+  PROMPT_EXTRACTOR,
+  PROMPT_JSON_CONTRACTS,
+  PROMPT_RULES_LITERAL,
+} from '@/ai/prompts/prompt-loader'
 
 export interface PipelineInput {
   reportId: string
@@ -79,16 +78,6 @@ export interface PipelineMeta {
   error_message: string | null
 }
 
-/**
- * Load a prompt file from disk
- */
-function loadPrompt(relativePath: string): string {
-  const fullPath = path.join(process.cwd(), relativePath)
-  if (!fs.existsSync(fullPath)) {
-    throw new Error(`Prompt file not found: ${fullPath}`)
-  }
-  return fs.readFileSync(fullPath, 'utf-8')
-}
 
 /**
  * Parse JSON from an LLM response, handling markdown fences and partial JSON.
@@ -172,10 +161,7 @@ async function extractWithOpenAI(
   pdfTextContent: string,
   sourceFileName: string
 ): Promise<Record<string, unknown>> {
-  const systemPrompt = loadPrompt(PROMPT_EXTRACTOR)
-  const rulesLiteral = loadPrompt(PROMPT_RULES_LITERAL)
-  const jsonContracts = loadPrompt(PROMPT_JSON_CONTRACTS)
-  const fullSystemPrompt = `${systemPrompt}\n\n---\n\n${rulesLiteral}\n\n---\n\n${jsonContracts}`
+  const fullSystemPrompt = `${PROMPT_EXTRACTOR}\n\n---\n\n${PROMPT_RULES_LITERAL}\n\n---\n\n${PROMPT_JSON_CONTRACTS}`
 
   const extractorModel = process.env.OPENAI_EXTRACTOR_MODEL || 'gpt-4o'
 
@@ -336,7 +322,7 @@ export async function runPipeline(
   pdfTextContent: string
 ): Promise<PipelineResult> {
   const meta: PipelineMeta = {
-    prompt_file_used_extractor: PROMPT_EXTRACTOR,
+    prompt_file_used_extractor: 'ai/prompts/openai/extract-premium-from-pdf.md (embedded)',
     structurer_model: null,
     template_files_seen: [],
     template_chosen: null,
