@@ -1,27 +1,35 @@
 /**
- * Report Generation Pipeline (OpenAI-only, Vision-enabled)
+ * Report Generation Pipeline
  * Step 0: PDF → page screenshots (PNG) via pdf-to-png-converter
  * Step 1: OpenAI Vision Extractor — page images → structured JSON (verbatim)
  * Step 2: Template loader selects best template
- * Step 3: OpenAI Vision Assembler — page images + template HTML → html_final (patch mode)
- * Step 4: Similarity scorer + anti-layout-inventado validation
+ * Step 3: Claude Sonnet 4.5 Structurer — extractedJson → StructuredReport JSON
+ * Step 4: Deterministic HTML Renderer — StructuredReport + template → html_final
+ * Step 5: Similarity scorer + anti-layout-inventado validation
  */
 
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
-import { selectTemplate, getTemplateFileNames } from './template-loader'
+import OpenAI from 'openai'
+import { selectTemplate, selectTemplateWithGolden, getTemplateFileNames } from './template-loader'
 import { computeTemplateSimilarity, MIN_SIMILARITY_SCORE } from './template-similarity'
 import { validateTemplateUsage } from './template-validation'
 import { convertPdfToImages, downloadPdfAsBuffer, buildVisionContentParts } from './pdf-to-images'
+import { callClaude, selectClaudeModel } from './claude'
+import { PREMIUM_STRUCTURER_SYSTEM } from '@/ai/prompts/premium-structurer'
+import { recognizeBlocks } from './block-recognizer'
+import type { SectionBlueprint } from './block-recognizer'
+import { validateStructuredReport } from './structured-report-validator'
+import type { StructuredReport } from '@/ai/prompts/premium-structurer'
+import { renderPremiumHTML } from '@/ai/templates/premiumTemplate'
 import type { PdfPageImage } from './pdf-to-images'
-import type { TemplateSelection } from './template-loader'
+import type { TemplateSelection, TemplateSelectionResult } from './template-loader'
 import type { SimilarityResult } from './template-similarity'
 import type { TemplateValidationResult } from './template-validation'
 
 // Prompt file paths (relative to project root)
 const PROMPT_EXTRACTOR = 'ai/prompts/openai/extract-premium-from-pdf.md'
-const PROMPT_ASSEMBLER = 'ai/prompts/openai/assemble-premium-html-from-template.md'
 const PROMPT_JSON_CONTRACTS = 'ai/prompts/shared/json-contracts.md'
 const PROMPT_RULES_LITERAL = 'ai/prompts/shared/rules-literal-content.md'
 
@@ -48,7 +56,7 @@ export interface PipelineResult {
 
 export interface PipelineMeta {
   prompt_file_used_extractor: string
-  prompt_file_used_assembler: string
+  structurer_model: string | null
   template_files_seen: string[]
   template_chosen: string | null
   template_file: string | null
@@ -60,10 +68,15 @@ export interface PipelineMeta {
   similarity_details: Record<string, unknown> | null
   similarity_diagnostics: string[]
   template_validation: TemplateValidationResult | null
+  template_source: 'golden' | 'filesystem' | null
+  golden_template_id: string | null
+  golden_examples_count: number
   pipeline_started_at: string
   pipeline_finished_at: string | null
   extraction_duration_ms: number | null
-  assembly_duration_ms: number | null
+  structurer_duration_ms: number | null
+  render_duration_ms: number | null
+  error_message: string | null
 }
 
 /**
@@ -102,50 +115,57 @@ function parseJsonResponse(raw: string): Record<string, unknown> {
 }
 
 /**
+ * Get or create the OpenAI SDK client (singleton).
+ */
+let _openaiClient: OpenAI | null = null
+function getOpenAIClient(): OpenAI {
+  if (!_openaiClient) {
+    const apiKey = process.env.OPENAI_API_KEY
+    if (!apiKey) throw new Error('OPENAI_API_KEY not set')
+    _openaiClient = new OpenAI({ apiKey, timeout: 300_000, maxRetries: 2 })
+  }
+  return _openaiClient
+}
+
+/**
  * Call OpenAI chat completions for extraction (text-only, no images).
+ * Uses the OpenAI SDK for proper timeout/retry handling.
  */
 async function extractTextOnly(
   systemPrompt: string,
   pdfTextContent: string,
   sourceFileName: string,
-  model: string,
-  apiKey: string
+  model: string
 ): Promise<Record<string, unknown>> {
   console.log(`[pipeline:extract] Text-only extraction with ${model}...`)
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      temperature: 0,
-      max_tokens: 16384,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        {
-          role: 'user',
-          content: `Extract the content from this financial report document.\n\nFilename: ${sourceFileName}\n\nDocument content:\n\n${pdfTextContent}`,
-        },
-      ],
-    }),
+  const openai = getOpenAIClient()
+  const completion = await openai.chat.completions.create({
+    model,
+    temperature: 0,
+    max_tokens: 16384,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      {
+        role: 'user',
+        content: `Extract the content from this financial report document.\n\nFilename: ${sourceFileName}\n\nDocument content:\n\n${pdfTextContent}`,
+      },
+    ],
   })
 
-  if (!response.ok) {
-    const errText = await response.text()
-    throw new Error(`OpenAI API error ${response.status}: ${errText.slice(0, 300)}`)
-  }
-
-  const data = await response.json()
-  const content = data.choices?.[0]?.message?.content || ''
+  const content = completion.choices?.[0]?.message?.content || ''
   return parseJsonResponse(content)
 }
 
 /**
- * Step 1: Call OpenAI Vision to extract structured JSON from PDF page screenshots.
- * Falls back to text-only extraction if vision fails.
+ * Step 1: 2-pass extraction pipeline.
+ *
+ * Pass 1 (text-only, ~15s): Extract all content from OCR text — fast, complete, no images.
+ * Pass 2 (vision enhancement, ~20s): Send page images (low detail) + Pass 1 JSON summary.
+ *   The model enriches with layout hints: chart descriptions, table structures, column layouts.
+ * Merge: Deep-merge Pass 2 enhancements into Pass 1 base.
+ *
+ * This avoids the single massive Vision call that was timing out (10+ min).
  */
 async function extractWithOpenAI(
   pageImages: PdfPageImage[],
@@ -157,260 +177,159 @@ async function extractWithOpenAI(
   const jsonContracts = loadPrompt(PROMPT_JSON_CONTRACTS)
   const fullSystemPrompt = `${systemPrompt}\n\n---\n\n${rulesLiteral}\n\n---\n\n${jsonContracts}`
 
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) throw new Error('OPENAI_API_KEY not set')
-
   const extractorModel = process.env.OPENAI_EXTRACTOR_MODEL || 'gpt-4o'
 
-  // If we have page images, try vision extraction first
-  if (pageImages.length > 0) {
-    console.log(`[pipeline:extract] Calling OpenAI Vision (${extractorModel}) for extraction...`)
-    console.log(`[pipeline:extract] Source: ${sourceFileName}, pages: ${pageImages.length}, text length: ${pdfTextContent.length}`)
+  // ── PASS 1: Text-only extraction (fast, complete content) ──
+  console.log(`[pipeline:extract] Pass 1: Text-only extraction with ${extractorModel}...`)
+  const pass1Start = Date.now()
+  const pass1Result = await extractTextOnly(fullSystemPrompt, pdfTextContent, sourceFileName, extractorModel)
+  const pass1Duration = Date.now() - pass1Start
+  const p1 = pass1Result as any
+  console.log(`[pipeline:extract] Pass 1 complete in ${pass1Duration}ms. Blocks: ${p1.blocks?.length || 0}, KPIs: ${p1.kpis?.length || p1.kpis_verbatim?.length || 0}`)
 
-    try {
-      const userContent = buildVisionContentParts(
-        pageImages,
-        `You are a financial data extraction engine. You MUST respond with ONLY a valid JSON object — no explanations, no apologies, no text before or after the JSON.\n\nExtract ALL content from this financial report.\nFilename: ${sourceFileName}\n\nBelow are screenshots of every page. Extract EVERY piece of text, number, table, KPI, heading, and paragraph you see — VERBATIM.\n\nSupplementary OCR text:\n${pdfTextContent.slice(0, 6000)}`,
-        'auto'
-      )
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: extractorModel,
-          temperature: 0,
-          max_tokens: 16384,
-          messages: [
-            { role: 'system', content: fullSystemPrompt + '\n\nIMPORTANT: You MUST return ONLY a valid JSON object. No prose, no apologies, no refusals. If you cannot extract something, use null in the JSON.' },
-            { role: 'user', content: userContent },
-          ],
-        }),
-      })
-
-      if (!response.ok) {
-        const errText = await response.text()
-        console.warn(`[pipeline:extract] Vision API error ${response.status}, falling back to text-only:`, errText.slice(0, 200))
-      } else {
-        const data = await response.json()
-        const content = data.choices?.[0]?.message?.content || ''
-        console.log(`[pipeline:extract] Vision response length: ${content.length}, preview: ${content.slice(0, 100)}...`)
-
-        const parsed = parseJsonResponse(content)
-        const p = parsed as any
-        console.log(`[pipeline:extract] Vision extraction complete. Blocks: ${p.blocks?.length || 0}, KPIs: ${p.kpis?.length || p.kpis_verbatim?.length || 0}`)
-        return parsed
-      }
-    } catch (err) {
-      console.warn(`[pipeline:extract] Vision extraction failed, falling back to text-only:`, err instanceof Error ? err.message : err)
-    }
+  // If no images available, return text-only result
+  if (pageImages.length === 0) {
+    console.log(`[pipeline:extract] No page images — skipping Pass 2 (vision enhancement)`)
+    return pass1Result
   }
 
-  // Fallback: text-only extraction
-  console.log(`[pipeline:extract] Using text-only extraction (no vision)...`)
-  const parsed = await extractTextOnly(fullSystemPrompt, pdfTextContent, sourceFileName, extractorModel, apiKey)
-  const p = parsed as any
-  console.log(`[pipeline:extract] Text-only extraction complete. Blocks: ${p.blocks?.length || 0}, KPIs: ${p.kpis?.length || p.kpis_verbatim?.length || 0}`)
-  return parsed
+  // ── PASS 2: Vision enhancement (images only, no text dump) ──
+  console.log(`[pipeline:extract] Pass 2: Vision enhancement with ${extractorModel}...`)
+  const pass2Start = Date.now()
+
+  const totalImageBytes = pageImages.reduce((sum, img) => sum + img.base64.length, 0)
+  console.log(`[pipeline:extract] Pass 2 payload: ${(totalImageBytes / 1024 / 1024).toFixed(1)}MB across ${pageImages.length} pages (all low detail)`)
+
+  try {
+    const openai = getOpenAIClient()
+
+    // Pass 2 prompt: images + compact summary of Pass 1, asking for visual enrichment only
+    const pass1Summary = JSON.stringify(pass1Result, null, 0).slice(0, 4000)
+    const visionPrompt = `You are a visual layout analyzer for financial reports. You MUST respond with ONLY a valid JSON object.
+
+I already extracted the text content from this report. Below is a compact summary of what was extracted:
+${pass1Summary}
+
+Now look at the page screenshots below. Your job is to ENRICH the extraction with visual information that text alone cannot capture:
+
+1. "layout_hints": For each section, describe the visual layout (e.g. "2-column grid", "full-width table", "chart with bars")
+2. "chart_descriptions": Describe any charts/graphs you see (type, axes, data points, colors)
+3. "table_structures": For any tables, confirm column count, header names, and row count
+4. "visual_hierarchy": Note which sections have colored headers (green=calls, red=puts), icons, or special styling
+5. "missing_content": Any text visible in images that is NOT in the summary above
+
+Return a JSON object with these keys. Keep descriptions concise. If nothing to add for a key, use an empty array [].`
+
+    const userContent: Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string; detail: 'low' } }> = [
+      { type: 'text', text: visionPrompt },
+    ]
+    for (const img of pageImages) {
+      userContent.push({ type: 'text', text: `--- Page ${img.pageNumber} ---` })
+      userContent.push({
+        type: 'image_url',
+        image_url: { url: `data:image/png;base64,${img.base64}`, detail: 'low' },
+      })
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: extractorModel,
+      temperature: 0,
+      max_tokens: 4096,
+      messages: [
+        { role: 'system', content: 'You are a visual document analyzer. Return ONLY valid JSON. No prose.' },
+        { role: 'user', content: userContent as any },
+      ],
+    })
+
+    const content = completion.choices?.[0]?.message?.content || ''
+    const pass2Duration = Date.now() - pass2Start
+    console.log(`[pipeline:extract] Pass 2 complete in ${pass2Duration}ms. Response: ${content.length} chars`)
+
+    // Merge vision enhancements into Pass 1 result
+    try {
+      const visionEnhancements = parseJsonResponse(content)
+      const merged = { ...pass1Result, _vision_enhancements: visionEnhancements }
+      console.log(`[pipeline:extract] Merged Pass 1 + Pass 2 successfully`)
+      return merged
+    } catch (mergeErr) {
+      console.warn(`[pipeline:extract] Pass 2 JSON parse failed, using Pass 1 only`)
+      return pass1Result
+    }
+  } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err)
+    const pass2Duration = Date.now() - pass2Start
+    console.warn(`[pipeline:extract] Pass 2 vision failed in ${pass2Duration}ms: ${errMsg}`)
+    console.log(`[pipeline:extract] Using Pass 1 text-only result (still complete content)`)
+    return pass1Result
+  }
 }
 
 /**
- * Step 2: Call OpenAI to assemble HTML from page images + template
- * Sends page screenshots + template HTML for vision-based single-pass replacement.
- * Also sends raw PDF text and extracted JSON as supplementary context.
+ * Step 3: Call Claude to structure extractedJson into a StructuredReport.
+ * Claude only produces JSON — no HTML generation.
  */
-async function assembleWithOpenAI(
-  pageImages: PdfPageImage[],
-  pdfText: string,
-  template: TemplateSelection,
-  extractedJson?: Record<string, unknown>
-): Promise<{ html_final: string; warnings: string[]; sections_mapped: unknown[] }> {
-  const systemPrompt = loadPrompt(PROMPT_ASSEMBLER)
-  const rulesLiteral = loadPrompt(PROMPT_RULES_LITERAL)
+async function structureWithClaude(
+  extractedJson: Record<string, unknown>,
+  model: string
+): Promise<{ structured: StructuredReport; warnings: string[]; blueprints: SectionBlueprint[] }> {
+  console.log(`[pipeline:structure] Calling Claude (${model}) to structure extracted JSON...`)
 
-  const apiKey = process.env.OPENAI_API_KEY
-  if (!apiKey) throw new Error('OPENAI_API_KEY not set')
+  // ── Block Recognizer: analyze extractedJson and generate section blueprint ──
+  const { blueprints, prompt_injection } = recognizeBlocks(extractedJson)
+  console.log(`[pipeline:structure] Block recognizer: ${blueprints.length} section blueprints generated`)
 
-  const assemblerModel = process.env.OPENAI_ASSEMBLER_MODEL || 'o3'
-  console.log(`[pipeline:assemble] Calling OpenAI (${assemblerModel}) with template: ${template.fileName}`)
-  console.log(`[pipeline:assemble] Template HTML length: ${template.html.length}, pages: ${pageImages.length}, PDF text length: ${pdfText.length}`)
+  // Inject blueprint into system prompt so Claude knows EXACTLY which components to use
+  const systemPromptWithBlueprint = PREMIUM_STRUCTURER_SYSTEM + '\n' + prompt_injection
 
-  // Build text instructions (template + supplementary data)
-  let textInstructions = `TASK: Clone the TEMPLATE_HTML below and replace ONLY the text content with matching content from the PDF pages shown above.
+  const userMessage = JSON.stringify(extractedJson, null, 2)
+  console.log(`[pipeline:structure] Input JSON size: ${userMessage.length} chars`)
 
-TEMPLATE_HTML (Filename: ${template.fileName}):
-${template.html}
+  const responseText = await callClaude(systemPromptWithBlueprint, userMessage, {
+    model,
+    maxTokens: 32000,
+    temperature: 0,
+  })
 
-PDF_TEXT (supplementary OCR text — use page screenshots as PRIMARY source, this text as backup):
-${pdfText}`
-
-  if (extractedJson) {
-    textInstructions += `
-
-EXTRACTED_JSON (supplementary structured data):
-${JSON.stringify(extractedJson, null, 2)}`
+  if (!responseText) {
+    throw new Error('Claude structurer returned empty response')
   }
 
-  textInstructions += `
+  console.log(`[pipeline:structure] Response length: ${responseText.length}`)
 
-INSTRUCTIONS:
-- Clone the TEMPLATE_HTML above. Replace ONLY the text content inside existing HTML elements with matching text from the PDF pages.
-- Look at EVERY page screenshot carefully — extract ALL text, numbers, tables, KPIs verbatim.
-- DO NOT invent new HTML structure. DO NOT change classes. DO NOT reorder sections.
-- Copy the <style> block VERBATIM — every single character.
-- Preserve ALL SVG icons exactly as they appear in the template.
-- Use PDF content verbatim — do not summarize or paraphrase.
-- If a value is not found in the PDF, use "—" and add a warning.
-
-TABLE RULES (CRITICAL):
-- Count the number of <th> elements in the template's <thead>. Your output MUST have the EXACT same number of <th> and <td> per row.
-- NEVER remove, merge, or collapse table columns. If the template has 4 columns, output 4 columns.
-- If the PDF table has different columns than the template, map by meaning (Strike→Strike, Volume→Volume, etc.) but keep ALL template columns.
-- If a column has no matching data, fill cells with "—" but keep the <td>.
-
-SECTION STRUCTURE RULES (CRITICAL):
-- Every flow-event div MUST contain <h5>Title</h5> followed by <p>Body text</p>. NEVER flatten into just a paragraph.
-- Every analysis-block MUST preserve its analysis-header div (with SVG icon + h4 title).
-- Every section-header MUST preserve section-icon (SVG) + section-title (h2) + section-subtitle (p).
-- Keep ALL container divs: section-container, analysis-block, flow-event, context-card, strategy-card, etc.
-
-- Return ONLY a JSON object with: template_chosen, html_final, warnings, sections_mapped.`
-
-  // Detect model type to choose correct API endpoint and params
-  const isCodexModel = /codex/i.test(assemblerModel)
-  const isReasoningModel = /^(o1|o3|o4)/.test(assemblerModel)
-
-  let response: Response
-  let content: string
-
-  if (isCodexModel) {
-    // Codex models use v1/responses (Responses API) — text only, no vision
-    const fullPrompt = `${systemPrompt}\n\n---\n\n${rulesLiteral}\n\n---\n\n${textInstructions}`
-
-    console.log(`[pipeline:assemble] Using Responses API for Codex model. Prompt length: ${fullPrompt.length}`)
-
-    response = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: assemblerModel,
-        input: fullPrompt,
-      }),
-    })
-
-    if (!response.ok) {
-      const errText = await response.text()
-      console.error(`[pipeline:assemble] OpenAI Responses API error ${response.status}:`, errText.slice(0, 500))
-      throw new Error(`OpenAI API error ${response.status}: ${errText.slice(0, 300)}`)
-    }
-
-    const data = await response.json()
-    content = data.output?.filter((o: { type: string }) => o.type === 'message')
-      ?.flatMap((o: { content: Array<{ type: string; text: string }> }) => o.content)
-      ?.filter((c: { type: string }) => c.type === 'output_text')
-      ?.map((c: { text: string }) => c.text)
-      ?.join('') || ''
-
-  } else {
-    // Chat models with vision support — send page images + text instructions
-    const userContent = buildVisionContentParts(pageImages, textInstructions)
-
-    const requestBody: Record<string, unknown> = {
-      model: assemblerModel,
-      messages: [
-        {
-          role: isReasoningModel ? 'developer' : 'system',
-          content: `${systemPrompt}\n\n---\n\n${rulesLiteral}`,
-        },
-        {
-          role: 'user',
-          content: userContent,
-        },
-      ],
-    }
-
-    if (isReasoningModel) {
-      requestBody.max_completion_tokens = 100000
-    } else {
-      // gpt-4o supports max 16384 completion tokens; gpt-4o-mini supports 16384
-      requestBody.max_tokens = 16384
-      requestBody.temperature = 0
-    }
-
-    response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(requestBody),
-    })
-
-    if (!response.ok) {
-      const errText = await response.text()
-      console.error(`[pipeline:assemble] OpenAI API error ${response.status}:`, errText.slice(0, 500))
-      throw new Error(`OpenAI API error ${response.status}: ${errText.slice(0, 300)}`)
-    }
-
-    const data = await response.json()
-    content = data.choices?.[0]?.message?.content || ''
-  }
-
-  if (!content) {
-    console.error(`[pipeline:assemble] OpenAI returned empty content.`)
-    throw new Error('OpenAI assembler returned empty content')
-  }
-
-  console.log(`[pipeline:assemble] Raw response length: ${content.length}`)
-  console.log(`[pipeline:assemble] Response preview: ${content.slice(0, 200)}...`)
-
-  // Parse JSON from response (handle possible markdown wrapping)
-  let jsonStr = content.trim()
+  // Parse JSON (handle markdown fences)
+  let jsonStr = responseText.trim()
   if (jsonStr.startsWith('```')) {
     jsonStr = jsonStr.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
   }
 
-  let parsed: Record<string, unknown>
+  let structured: StructuredReport
   try {
-    parsed = JSON.parse(jsonStr)
+    structured = JSON.parse(jsonStr) as StructuredReport
   } catch (parseErr) {
-    console.error(`[pipeline:assemble] JSON parse failed. First 500 chars:`, jsonStr.slice(0, 500))
-    console.error(`[pipeline:assemble] Last 500 chars:`, jsonStr.slice(-500))
-    // Try to extract html_final directly if JSON parse fails
-    const htmlMatch = jsonStr.match(/"html_final"\s*:\s*"((?:[^"\\]|\\[\s\S])*)"/) 
-    if (htmlMatch) {
-      console.log(`[pipeline:assemble] Recovered html_final via regex (${htmlMatch[1].length} chars)`)
-      parsed = { html_final: htmlMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"'), warnings: ['JSON parse failed, recovered html_final via regex'], sections_mapped: [] }
+    console.error(`[pipeline:structure] JSON parse failed. First 500 chars:`, jsonStr.slice(0, 500))
+    // Try to find JSON object in response
+    const match = jsonStr.match(/\{[\s\S]*\}/)
+    if (match) {
+      structured = JSON.parse(match[0]) as StructuredReport
     } else {
-      throw new Error(`Failed to parse OpenAI response as JSON: ${(parseErr as Error).message}`)
+      throw new Error(`Failed to parse Claude structurer response as JSON: ${(parseErr as Error).message}`)
     }
   }
 
-  // Check for integrity failure
-  if (parsed.error === 'TEMPLATE_INTEGRITY_FAILED') {
-    throw new Error('Assembler reported TEMPLATE_INTEGRITY_FAILED — could not match template structure')
-  }
+  const warnings: string[] = []
 
-  console.log(`[pipeline:assemble] Assembly complete. HTML size: ${(parsed.html_final as string)?.length || 0}`)
-  console.log(`[pipeline:assemble] Warnings: ${(parsed.warnings as unknown[])?.length || 0}`)
+  // Basic validation
+  if (!structured.title) warnings.push('structurer: missing title')
+  if (!structured.kpis || structured.kpis.length === 0) warnings.push('structurer: no KPIs found')
+  if (!structured.sections || structured.sections.length === 0) warnings.push('structurer: no sections found')
 
-  return {
-    html_final: (parsed.html_final as string) || '',
-    warnings: ((parsed.warnings || []) as Array<{ type?: string; message?: string; reason?: string } | string>).map((w) =>
-      typeof w === 'string' ? w : `${w.type || 'warning'}: ${w.message || w.reason || ''}`
-    ),
-    sections_mapped: (parsed.sections_mapped as unknown[]) || [],
-  }
+  console.log(`[pipeline:structure] Structured: title="${structured.title}", kpis=${structured.kpis?.length || 0}, sections=${structured.sections?.length || 0}, strategy=${structured.strategy ? 'yes' : 'no'}, conclusion=${structured.conclusion ? 'yes' : 'no'}`)
+
+  return { structured, warnings, blueprints }
 }
 
 /**
- * Run the full pipeline: Extract → Select Template → Assemble → Validate
+ * Run the full pipeline: Extract → Select Template → Structure → Render → Validate
  */
 export async function runPipeline(
   input: PipelineInput,
@@ -418,7 +337,7 @@ export async function runPipeline(
 ): Promise<PipelineResult> {
   const meta: PipelineMeta = {
     prompt_file_used_extractor: PROMPT_EXTRACTOR,
-    prompt_file_used_assembler: PROMPT_ASSEMBLER,
+    structurer_model: null,
     template_files_seen: [],
     template_chosen: null,
     template_file: null,
@@ -430,10 +349,15 @@ export async function runPipeline(
     similarity_details: null,
     similarity_diagnostics: [],
     template_validation: null,
+    template_source: null,
+    golden_template_id: null,
+    golden_examples_count: 0,
     pipeline_started_at: new Date().toISOString(),
     pipeline_finished_at: null,
     extraction_duration_ms: null,
-    assembly_duration_ms: null,
+    structurer_duration_ms: null,
+    render_duration_ms: null,
+    error_message: null,
   }
 
   const warnings: string[] = []
@@ -443,22 +367,22 @@ export async function runPipeline(
     meta.template_files_seen = getTemplateFileNames()
     console.log(`[pipeline] Template files seen: ${meta.template_files_seen.length}`)
 
-    // STEP 0: Get PDF buffer and convert to page screenshots
+    // STEP 0: Convert PDF to page images for Vision extraction
+    // ALL pages extracted at scale 1.0 (small per-page payload)
+    // Tiered detail in Vision call: high for pages 1-2, low for rest
     let pageImages: PdfPageImage[] = []
     const imgStart = Date.now()
 
     if (input.pdfBase64) {
-      // Client sent the PDF as base64
-      console.log(`[pipeline] Step 0: Converting base64 PDF to page images...`)
+      console.log(`[pipeline] Step 0: Converting base64 PDF to page images (scale=1.0, ALL pages)...`)
       const pdfBuffer = Buffer.from(input.pdfBase64, 'base64')
-      pageImages = await convertPdfToImages(pdfBuffer, { scale: 2 })
+      pageImages = await convertPdfToImages(pdfBuffer, { scale: 1.0 })
     } else if (input.sourceFileUrl) {
-      // Download from storage URL
-      console.log(`[pipeline] Step 0: Downloading PDF and converting to page images...`)
+      console.log(`[pipeline] Step 0: Downloading PDF and converting to page images (scale=1.0, ALL pages)...`)
       const pdfBuffer = await downloadPdfAsBuffer(input.sourceFileUrl)
-      pageImages = await convertPdfToImages(pdfBuffer, { scale: 2 })
+      pageImages = await convertPdfToImages(pdfBuffer, { scale: 1.0 })
     } else {
-      console.log(`[pipeline] Step 0: No PDF file available — using text-only mode (no vision)`)
+      console.log(`[pipeline] Step 0: No PDF file available — text-only mode`)
     }
 
     const imgDuration = Date.now() - imgStart
@@ -466,35 +390,63 @@ export async function runPipeline(
       console.log(`[pipeline] PDF → ${pageImages.length} page images in ${imgDuration}ms`)
     }
 
-    // STEP 1: Extract with OpenAI Vision (page screenshots + supplementary text)
+    // STEP 1: Extract with OpenAI Vision (page images + supplementary text)
     const extractStart = Date.now()
     const extractedJson = await extractWithOpenAI(pageImages, pdfTextContent, input.sourceFileName)
     meta.extraction_duration_ms = Date.now() - extractStart
     meta.extracted_json_size = JSON.stringify(extractedJson).length
     console.log(`[pipeline] Extraction took ${meta.extraction_duration_ms}ms, JSON size: ${meta.extracted_json_size}`)
 
-    // STEP 2: Select template (ticker-aware matching)
+    // STEP 2: Select template (golden templates first, then filesystem)
     const ticker = extractTickerFromJson(extractedJson)
-    const chosenTemplate = selectTemplate(
-      { category: 'opciones_premium', ticker },
+    const templateResult = await selectTemplateWithGolden(
+      { category: 'opciones_premium', ticker, userId: input.userId },
       extractedJson
     )
+    const chosenTemplate = templateResult.primary
     meta.template_chosen = chosenTemplate.fileName
     meta.template_file = chosenTemplate.fileName
     meta.template_hash = chosenTemplate.hash
-    console.log(`[pipeline] Template chosen: ${chosenTemplate.fileName} (hash: ${chosenTemplate.hash})`)
+    meta.template_source = templateResult.source
+    meta.golden_template_id = templateResult.goldenId || null
+    meta.golden_examples_count = templateResult.goldenExamples.length
+    console.log(`[pipeline] Template chosen: ${chosenTemplate.fileName} (hash: ${chosenTemplate.hash}, source: ${templateResult.source}, golden_examples: ${templateResult.goldenExamples.length})`)
 
-    // STEP 3: Assemble with OpenAI Vision (page screenshots + template HTML)
-    const assembleStart = Date.now()
-    const assemblyResult = await assembleWithOpenAI(pageImages, pdfTextContent, chosenTemplate, extractedJson)
-    meta.assembly_duration_ms = Date.now() - assembleStart
-    meta.html_size = assemblyResult.html_final.length
-    meta.html_hash = crypto.createHash('sha256').update(assemblyResult.html_final).digest('hex').slice(0, 16)
-    warnings.push(...assemblyResult.warnings)
-    console.log(`[pipeline] Assembly took ${meta.assembly_duration_ms}ms, HTML size: ${meta.html_size}`)
+    // STEP 3: Structure with Claude (extractedJson → StructuredReport JSON)
+    const blockCount = (extractedJson as any).blocks?.length || 0
+    const claudeModel = selectClaudeModel(blockCount, pageImages.length)
+    meta.structurer_model = claudeModel
 
-    // STEP 4a: Anti-layout-inventado validation
-    const templateValidation = validateTemplateUsage(chosenTemplate.html, assemblyResult.html_final)
+    const structureStart = Date.now()
+    const { structured, warnings: structureWarnings, blueprints } = await structureWithClaude(extractedJson, claudeModel)
+    meta.structurer_duration_ms = Date.now() - structureStart
+    warnings.push(...structureWarnings)
+    console.log(`[pipeline] Structuring took ${meta.structurer_duration_ms}ms`)
+
+    // STEP 3b: Validate structured report against blueprints
+    const validation = validateStructuredReport(structured, blueprints)
+    if (validation.repairs.length > 0) {
+      warnings.push(`structurer_auto_repairs: ${validation.repairs.join('; ')}`)
+    }
+    for (const issue of validation.issues) {
+      if (issue.severity === 'error') {
+        warnings.push(`structurer_error: [${issue.section}] ${issue.message}`)
+      } else {
+        warnings.push(`structurer_warning: [${issue.section}] ${issue.message}`)
+      }
+    }
+    console.log(`[pipeline] Structured report validation: ${validation.valid ? 'PASSED' : 'HAS ISSUES'} (${validation.content_block_count} content blocks, ${validation.issues.length} issues, ${validation.repairs.length} repairs)`)
+
+    // STEP 4: Deterministic HTML Render (StructuredReport + template → html_final)
+    const renderStart = Date.now()
+    const htmlFinal = renderPremiumHTML(structured, chosenTemplate.html)
+    meta.render_duration_ms = Date.now() - renderStart
+    meta.html_size = htmlFinal.length
+    meta.html_hash = crypto.createHash('sha256').update(htmlFinal).digest('hex').slice(0, 16)
+    console.log(`[pipeline] Render took ${meta.render_duration_ms}ms, HTML size: ${meta.html_size}`)
+
+    // STEP 5a: Anti-layout-inventado validation
+    const templateValidation = validateTemplateUsage(chosenTemplate.html, htmlFinal)
     meta.template_validation = templateValidation
 
     console.log(`[pipeline] Template validation: ${templateValidation.passed ? 'PASSED' : 'FAILED'}`)
@@ -524,8 +476,8 @@ export async function runPipeline(
       }
     }
 
-    // STEP 4b: Validate similarity (existing scorer)
-    const similarity = computeTemplateSimilarity(assemblyResult.html_final, chosenTemplate.html)
+    // STEP 5b: Validate similarity (existing scorer)
+    const similarity = computeTemplateSimilarity(htmlFinal, chosenTemplate.html)
     meta.template_similarity_score = similarity.score
     meta.similarity_details = similarity.details as unknown as Record<string, unknown>
     meta.similarity_diagnostics = similarity.diagnostics
@@ -550,7 +502,7 @@ export async function runPipeline(
     return {
       success: true,
       extractedJson,
-      htmlFinal: assemblyResult.html_final,
+      htmlFinal,
       templateChosen: chosenTemplate.fileName,
       similarityResult: similarity,
       warnings,
@@ -560,7 +512,11 @@ export async function runPipeline(
   } catch (error) {
     meta.pipeline_finished_at = new Date().toISOString()
     const errMsg = error instanceof Error ? error.message : String(error)
+    meta.error_message = errMsg
     console.error(`[pipeline] Error: ${errMsg}`)
+    if (error instanceof Error && error.stack) {
+      console.error(`[pipeline] Stack: ${error.stack.split('\n').slice(0, 5).join('\n')}`)
+    }
 
     return {
       success: false,

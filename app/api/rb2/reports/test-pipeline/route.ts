@@ -104,7 +104,8 @@ export async function POST(request: NextRequest) {
       extracted_json_size: result.meta.extracted_json_size,
       html_size: result.meta.html_size,
       extraction_duration_ms: result.meta.extraction_duration_ms,
-      assembly_duration_ms: result.meta.assembly_duration_ms,
+      structurer_duration_ms: result.meta.structurer_duration_ms,
+      render_duration_ms: result.meta.render_duration_ms,
       warnings_count: result.warnings.length,
       diagnostics_count: result.meta.similarity_diagnostics.length,
     }

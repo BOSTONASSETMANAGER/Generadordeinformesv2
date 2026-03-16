@@ -1,5 +1,5 @@
 <div class="ggal-analisis-estatico">
-    
+
     <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-container">
@@ -8,7 +8,7 @@
                 Volver a Opciones
             </a>
             <h1 class="hero-title">Análisis Cuantitativo y Estratégico de Derivados Financieros – (GGAL)</h1>
-            <p class="hero-subtitle">Período de Análisis: Semana del 12 al 16 de Enero de 2026 | Activo Subyacente: Grupo Financiero Galicia (GGAL) | Precio Spot de Cierre: $7.765 (-1,09%)</p>
+            <p class="hero-subtitle">Período de Análisis: Semana del 16 al 20 de Febrero de 2026 | Grupo Financiero Galicia (GGAL) | Precio Spot: $7.170 | Variación: +4,57%</p>
         </div>
     </section>
 
@@ -22,7 +22,7 @@
                     </div>
                     <div class="kpi-content">
                         <span class="kpi-label">Período de Análisis</span>
-                        <span class="kpi-value">12-16 Ene 2026</span>
+                        <span class="kpi-value">16-20 Feb 2026</span>
                     </div>
                 </div>
                 <div class="kpi-card">
@@ -31,7 +31,7 @@
                     </div>
                     <div class="kpi-content">
                         <span class="kpi-label">Vencimiento Opex</span>
-                        <span class="kpi-value">20 Feb 2026</span>
+                        <span class="kpi-value">17 Abr 2026</span>
                     </div>
                 </div>
                 <div class="kpi-card">
@@ -40,23 +40,23 @@
                     </div>
                     <div class="kpi-content">
                         <span class="kpi-label">Precio Spot Cierre</span>
-                        <span class="kpi-value">$7.765</span>
+                        <span class="kpi-value">$7.170</span>
                     </div>
                 </div>
-                <div class="kpi-card highlight-negative">
-                    <div class="kpi-icon danger">
+                <div class="kpi-card">
+                    <div class="kpi-icon">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
                     </div>
                     <div class="kpi-content">
                         <span class="kpi-label">Variación Semanal</span>
-                        <span class="kpi-value danger">-1,09%</span>
+                        <span class="kpi-value">+4,57%</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Sección PRE: Contexto Macroeconómico -->
+    <!-- Contexto -->
     <section class="context-section">
         <div class="section-container">
             <div class="context-card">
@@ -64,21 +64,21 @@
                     <div class="context-icon">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                     </div>
-                    <h2 class="context-title">SECCIÓN PRE: CONTEXTO MACROECONÓMICO Y NOTICIAS RELEVANTES</h2>
+                    <h2 class="context-title">Contexto Macro y Drivers de Mercado</h2>
                 </div>
-                <p>El análisis de la semana comprendida entre el 12 de enero y el 16 de enero de 2026 para Grupo Financiero Galicia (GGAL) exige una comprensión profunda de los vectores macroeconómicos que han moldeado la acción del precio tanto en la plaza local (BYMA) como en su cotización internacional. Durante este período, el activo subyacente ha operado bajo una dinámica de recalibración, influenciada por la política monetaria del Banco Central de la República Argentina (BCRA) y la relación con el Fondo Monetario Internacional (FMI).</p>
-                <p style="margin-top: 15px;">La gestión de las reservas internacionales ha sido el driver principal. El BCRA ha mantenido una racha de diez ruedas consecutivas de compras netas en el Mercado Libre de Cambios (MLC), acumulando durante la semana un saldo positivo de USD 469 millones. Para una entidad financiera como GGAL, este escenario de estabilidad cambiaria refuerza la tesis del "carry trade", donde la tasa real en pesos supera la devaluación esperada, atrayendo capitales hacia instrumentos de renta fija y, por extensión, mejorando los ratios de liquidez bancaria.</p>
-                <p style="margin-top: 15px;">En el frente fiscal y de deuda, la confirmación de la misión técnica del FMI para febrero de 2026 ha actuado como un ancla de expectativas. Aunque existe un desvío material en la meta de reservas netas acumuladas al cierre de 2025, el mercado descuenta la aprobación de un waiver basado en el cumplimiento estricto del superávit primario del 1,3% del PBI y la aprobación del Presupuesto 2026. Este respaldo internacional es crítico para la valoración de los activos bancarios, ya que reduce el riesgo de default soberano y mejora la curva de rendimientos de los bonos que forman parte del balance de GGAL.</p>
+                <p>El análisis de la microestructura de mercado de Grupo Financiero Galicia (GGAL) durante la tercera semana de febrero de 2026 revela una divergencia profunda entre la acción del precio en el mercado de contado y la percepción del riesgo en el ecosistema de derivados. Mientras que el activo subyacente local cerró la rueda del 20 de febrero con un avance nominal del 4,57%, situando el precio spot en los $7.170, el complejo de opciones comenzó a internalizar un cambio de régimen en la volatilidad que desafía las estrategias de cobertura tradicionales. Este informe disecciona las variables cuantitativas y los flujos de capital que definieron la dinámica operativa entre el 16 y el 20 de febrero, proveyendo un marco analítico exhaustivo para la toma de decisiones en el corto y mediano plazo.</p>
+                <p style="margin-top: 15px;">La dinámica de GGAL no puede interpretarse sin el tamiz de los indicadores macroeconómicos publicados durante el período. El dato de inflación de enero de 2026, situado en el 2,9% mensual con una proyección interanual del 32,4%, ha establecido un piso para las tasas de interés reales. Este entorno inflacionario, aunque muestra una desaceleración respecto a picos históricos, sigue presionando los márgenes de intermediación financiera de los bancos comerciales. El BCRA ha respondido manteniendo la tasa TAMAR en niveles del 34,625% nominal anual para los bancos privados, lo que implica un costo de fondeo que obliga a las entidades a ser extremadamente selectivas en la expansión del crédito.</p>
+                <p style="margin-top: 15px;">Durante la semana objeto de análisis, el mercado local debió procesar eventos de alta carga política y social, destacándose la huelga general del 19 de febrero. A pesar de la paralización de diversas actividades, el índice S&P Merval mostró una resiliencia inesperada, cerrando dicha jornada con una subida del 4,26%, impulsada precisamente por el sector bancario. Esta "desconexión" entre la calle y el mercado financiero sugiere que los inversores institucionales están ponderando positivamente el superávit comercial obtenido en enero y la acumulación de reservas internacionales, que al 18 de febrero alcanzaron los USD 45.130 millones.</p>
             </div>
         </div>
     </section>
 
-    <!-- Sección A: Insights de Flujo -->
+    <!-- SECCIÓN A: INSIGHTS DE FLUJO Y ACTIVIDAD DE MERCADO -->
     <section class="insights-section">
         <div class="section-container">
             <div class="section-header">
-                <div class="section-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                <div class="section-icon" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                 </div>
                 <div>
                     <h2 class="section-title">SECCIÓN A: INSIGHTS DE FLUJO Y ACTIVIDAD DE MERCADO</h2>
@@ -86,140 +86,93 @@
                 </div>
             </div>
 
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">1. Mapa de Calor (Volumen): Microestructura de Opciones</h3>
-            
-            <p class="section-text">La actividad se ha desplazado desde la especulación direccional pura hacia estrategias de cobertura y toma de beneficios en primas. El volumen total en el segmento de Calls alcanzó los $1.929.764.403, mientras que los Puts movilizaron $1.127.751.699. Este ratio volumen Put/Call de aproximadamente 0,58 sugiere que, aunque el sentimiento general sigue siendo constructivo, la demanda de seguros contra caídas ha despertado notablemente en comparación con semanas anteriores.</p>
+            <p class="section-text">La microestructura de mercado durante la semana del 16 al 20 de febrero ha estado dominada por el posicionamiento estratégico en el ejercicio de abril (AB), con una actividad residual pero volátil en el ejercicio de febrero que expiraba en dicho período. El análisis del flujo de órdenes revela que los inversores han pasado de una fase de acumulación agresiva a una de gestión de rangos y rotación de coberturas.</p>
+
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">1. Mapa de Calor (Volumen): La Geografía de las Primas</h3>
+
+            <p class="section-text">El volumen total operado en la matriz de opciones el 20 de febrero fue contundente: <strong>$4.362.774.835</strong> en Calls frente a <strong>$1.053.989.915</strong> en Puts. Esta relación de volumen Call/Put de <strong>4,14 a 1</strong> indica un sesgo alcista predominante, aunque el análisis detallado por strike sugiere que una parte significativa del flujo en Calls corresponde a estrategias de cierre de posiciones o armado de "spreads" defensivos ante el avance del spot.</p>
 
             <div class="volume-summary">
                 <div class="volume-item calls">
-                    <span class="volume-label">Volumen Total en Calls</span>
-                    <span class="volume-value">$1.929.764.403</span>
+                    <span class="volume-label">Volumen Calls</span>
+                    <span class="volume-value">$4.362.774.835</span>
                 </div>
                 <div class="volume-item puts">
-                    <span class="volume-label">Volumen Total en Puts</span>
-                    <span class="volume-value">$1.127.751.699</span>
+                    <span class="volume-label">Volumen Puts</span>
+                    <span class="volume-value">$1.053.989.915</span>
                 </div>
                 <div class="volume-item ratio">
-                    <span class="volume-label">Ratio Put/Call (Volumen)</span>
-                    <span class="volume-value">0,58</span>
+                    <span class="volume-label">Ratio Call/Put</span>
+                    <span class="volume-value">4,14 : 1</span>
                 </div>
             </div>
+
         </div>
     </section>
 
     <!-- Análisis de Calls y Puts -->
     <section class="heatmap-section">
         <div class="section-container">
-            <!-- Calls Analysis -->
             <div class="analysis-block">
                 <div class="analysis-header calls">
                     <div class="analysis-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
                     </div>
-                    <h4>A. Calls (Opciones de Compra): La Capitulación de los Strikes OTM</h4>
+                    <h4>Actividad en Calls (Opciones de Compra)</h4>
                 </div>
-                <p class="analysis-intro">La actividad en los Calls ha estado dominada por las bases superiores a los $8.000. El strike <strong>GFGC8530FE</strong> registró el mayor número de contratos operados (24.633 lotes), lo que refleja una masa crítica de inversores minoristas operando "lotería" de cortísimo plazo. Sin embargo, la caída del 20,91% en su precio el viernes 16 indica que este volumen no representa acumulación, sino más bien una liquidación forzosa ante la falta de impulso alcista del papel hacia el cierre de la semana.</p>
-                
-                <p style="font-size: 0.95rem; line-height: 1.7; color: var(--saas-text); margin-top: 15px;">Otro foco de actividad intensa se localizó en el strike <strong>GFGC8230FE</strong>, con 16.556 contratos negociados por un valor nominal de $471.515.908. La dinámica de precios en esta base muestra que los lanzadores (vendedores de opciones) están ganando la batalla del tiempo (Theta). A pesar de que la acción intentó sostenerse por encima de los $7.800, la prima de esta base se derrumbó un 14,51%, evidenciando un colapso en la volatilidad implícita y una erosión del valor extrínseco.</p>
+                <p class="analysis-intro">El strike que concentró la mayor atención del mercado fue el <strong>GFGC75282A</strong>, que registró un volumen nominal de <strong>$1.685.819.920</strong> con <strong>44.108 contratos</strong> operados en una sola rueda. Este nivel se ha convertido en el epicentro de la especulación para el ejercicio de abril. La interpretación de este flujo es binaria: por un lado, representa el optimismo de los compradores que buscan apalancar una subida hacia los $8.000; por otro, refleja la actividad de los lanzadores que proveen liquidez en una zona que consideran una resistencia técnica robusta de mediano plazo.</p>
+                <ul style="list-style: disc; margin: 15px 0 15px 25px; font-size: 0.95rem; line-height: 1.7; color: var(--saas-text);">
+                    <li><strong>GFGC77515A</strong> (Strike $7.751,50): Volumen de <strong>$557.403.875</strong> con <strong>18.548 contratos</strong>. Actividad ligada a la toma de coberturas por parte de carteras que ya se encuentran "In The Money" en bases inferiores.</li>
+                    <li><strong>GFGC73515A</strong> (Strike $7.351,50): Volumen de <strong>$539.084.058</strong> con <strong>11.335 contratos</strong>. Esta base, situada apenas por encima del precio spot de cierre, funcionó como el campo de batalla diario para los "day traders" y algoritmos de arbitraje entre el ADR y la local.</li>
+                    <li><strong>GFGC79515A</strong> (Strike $7.951,50): Con <strong>19.502 contratos</strong> operados, esta base "Out of The Money" (OTM) es utilizada frecuentemente como "tapa" para estrategias de crédito o por inversores minoristas que buscan "lotería" de bajo costo ante la expectativa de un movimiento explosivo.</li>
+                </ul>
             </div>
 
-            <!-- Puts Analysis -->
             <div class="analysis-block">
                 <div class="analysis-header puts">
                     <div class="analysis-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
                     </div>
-                    <h4>B. Puts (Opciones de Venta): El Despertar de la Cobertura Institucional</h4>
+                    <h4>Actividad en Puts (Opciones de Venta)</h4>
                 </div>
-                <p class="analysis-intro">A diferencia de los Calls, el flujo en los Puts muestra señales de "dinero inteligente" buscando protección. El strike <strong>GFGV7530FE</strong> movilizó 17.917 contratos. El hecho de que su precio subiera un 10,09% en la rueda del viernes, mientras el subyacente caía apenas un 1,08%, demuestra que los operadores están pagando con urgencia por protección debajo de la zona de los $7.500.</p>
-                
-                <p style="font-size: 0.95rem; line-height: 1.7; color: var(--saas-text); margin-top: 15px;">La base <strong>GFGV7930FE</strong> también mostró una actividad inusual con 9.420 lotes operados. Al ser una base In-The-Money (ITM) al cierre de la semana, su volumen sugiere un cierre de posiciones cubiertas o una apuesta táctica a que el papel perforará el soporte de corto plazo para ir a buscar la zona de los $7.600.</p>
-                
-                <p style="font-size: 0.95rem; line-height: 1.7; color: var(--saas-text); margin-top: 15px; margin-bottom: 15px;"><strong>Tabla Resumen: Principales Strikes por Actividad</strong></p>
-                
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Strike</th>
-                                <th>Lotes Operados</th>
-                                <th>Variación %</th>
-                                <th>Interpretación</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="row-highlight">
-                                <td><span class="strike-tag otm">GFGC8530FE</span></td>
-                                <td>24.633</td>
-                                <td><span class="change-badge negative">-20,91%</span></td>
-                                <td class="interpretation-cell">Especulación fallida / Cierre de posiciones</td>
-                            </tr>
-                            <tr>
-                                <td><span class="strike-tag otm">GFGC8230FE</span></td>
-                                <td>16.556</td>
-                                <td><span class="change-badge negative">-14,51%</span></td>
-                                <td class="interpretation-cell">Vaciado de primas por Theta y Vega</td>
-                            </tr>
-                            <tr>
-                                <td><span class="strike-tag put">GFGV7530FE</span></td>
-                                <td>17.917</td>
-                                <td><span class="change-badge positive">+10,09%</span></td>
-                                <td class="interpretation-cell">Demanda real de cobertura</td>
-                            </tr>
-                            <tr>
-                                <td><span class="strike-tag put">GFGC7930FE</span></td>
-                                <td>8.940</td>
-                                <td><span class="change-badge negative">-9,70%</span></td>
-                                <td class="interpretation-cell">Resistencia inmediata en derivados</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <p class="analysis-intro">El flujo en los Puts, aunque menor en volumen total, mostró una concentración estratégica en niveles de soporte crítico. El strike <strong>GFGV69282A</strong> operó <strong>$386.163.490</strong> con <strong>12.413 contratos</strong>. Este volumen indica una demanda genuina de protección. Los inversores institucionales están dispuestos a pagar primas significativas para asegurar un piso ante la posibilidad de que el papel perfore la zona de los $7.000, un soporte psicológico y técnico de gran relevancia.</p>
+                <p style="font-size: 0.95rem; line-height: 1.7; color: var(--saas-text); margin-top: 15px;">La base <strong>GFGV61515A</strong> también destacó con <strong>16.671 contratos</strong>. Al estar profundamente OTM (~14% por debajo del spot), este flujo se interpreta como una cobertura de "riesgo de cola" (tail risk). Inversores con grandes tenencias de acciones físicas utilizan estos puts baratos como un seguro contra una corrección sistémica del mercado argentino.</p>
             </div>
 
-            <!-- Open Interest Section -->
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 35px 0 15px 0;">2. Imanes de Precio (Open Interest): Geografía del Vencimiento Febrero</h3>
-            
-            <p style="font-size: 0.95rem; line-height: 1.7; color: var(--saas-text); margin-bottom: 20px;">El Interés Abierto (OI) es el mapa que indica dónde están posicionados los grandes actores del mercado (lanzadores) y cuáles son los niveles que defenderán agresivamente a medida que se acerque el vencimiento del 20 de febrero de 2026.</p>
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">2. Imanes de Precio (Open Interest): Murallas y Zonas de Pinning</h3>
 
-            <div class="analysis-block">
-                <div class="analysis-header calls">
-                    <div class="analysis-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <h4>A. Murallas de Resistencia (Call Wall)</h4>
-                </div>
-                <p class="analysis-intro">La zona comprendida entre los <strong>$8.230 y $8.530</strong> se ha consolidado como la muralla defensiva principal de los lanzadores. Con un volumen acumulado de más de 40.000 lotes en estas bases solo en las últimas ruedas, el incentivo para que el mercado "no deje pasar" al precio por encima de los $8.200 es máximo. Si el spot se acercara a estos niveles, veríamos una oferta masiva de papel físico para planchar la cotización y asegurar que estas opciones expiren sin valor (OTM).</p>
-            </div>
-
-            <div class="analysis-block">
-                <div class="analysis-header puts">
-                    <div class="analysis-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <h4>B. Zonas de Soporte y "Pinning" (Put Wall)</h4>
-                </div>
-                <p class="analysis-intro">En el flanco inferior, la base <strong>$7.530</strong> actúa como el primer "suelo" psicológico y técnico. Existe una acumulación de contratos en esta zona que sugiere que los lanzadores de Puts están dispuestos a defender los $7.500 como nivel de rebote. Por debajo de este nivel, la siguiente zona de soporte mayor se ubica en los <strong>$7.150</strong>, donde el interés abierto de los Puts comienza a diluirse, lo que indicaría un riesgo de caída libre si se perfora el primer muro.</p>
-            </div>
+            <p class="section-text">El análisis de las murallas de volumen nominal nos permite inferir dónde se encuentran posicionados los grandes lanzadores y qué niveles defenderán con mayor agresividad hacia el vencimiento de abril.</p>
 
             <div class="analysis-block">
                 <div class="analysis-header" style="border-bottom-color: var(--saas-accent);">
                     <div class="analysis-icon" style="background: rgba(37, 99, 235, 0.1); color: var(--saas-accent);">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
-                    <h4>C. El Concepto de Max Pain</h4>
+                    <h4>Murallas de Resistencia y Soporte</h4>
                 </div>
-                <p class="analysis-intro">Dada la distribución actual de primas y volúmenes, el punto de máximo dolor (donde los compradores de opciones pierden la mayor cantidad de capital acumulado) se sitúa en el rango de los <strong>$7.700 a $7.850</strong>. Este es el "imán" que atraerá al precio durante las próximas ruedas de no mediar un evento macro exógeno violento. El mercado está diseñado para "pinchar" el precio en zonas donde la mayor cantidad de contratos Call y Put expiren con el menor valor posible para los tenedores minoristas.</p>
+                <ul style="list-style: disc; margin: 15px 0 15px 25px; font-size: 0.95rem; line-height: 1.7; color: var(--saas-text);">
+                    <li><strong>Muralla de Resistencia (Call Wall): $7.528 - $7.553.</strong> La enorme concentración en la base 7528 actúa como un techo magnético. Para los lanzadores de estas opciones, el escenario ideal es que el precio de GGAL no supere este nivel. Si el spot se acerca a esta zona, es altamente probable que aparezca una presión vendedora en el mercado de contado para "pinchar" el precio y asegurar que las opciones expiren sin valor intrínseco.</li>
+                    <li><strong>Zona de Soporte (Put Wall): $6.928.</strong> Los $6.928 representan el primer baluarte defensivo. El volumen operado aquí sugiere que hay un interés comprador latente o, al menos, un rechazo a que el precio caiga por debajo de este umbral en el corto plazo.</li>
+                </ul>
             </div>
+
+            <div class="insight-card" style="margin-top: 25px;">
+                <div class="insight-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    Efecto Imán
+                </div>
+                <p>El precio de cierre de <strong>$7.175</strong> se encuentra en una zona de relativo "vacío" entre las grandes murallas, lo que explica la volatilidad intradiaria observada. El papel tiene el camino despejado hacia los <strong>$7.350</strong>, pero encontrará una resistencia creciente a medida que se acerque a los <strong>$7.500</strong>.</p>
+            </div>
+
         </div>
     </section>
 
-    <!-- Sección B: Métricas Cuantitativas -->
+    <!-- SECCIÓN B: MÉTRICAS CUANTITATIVAS -->
     <section class="insights-section" style="background: var(--saas-light);">
         <div class="section-container">
             <div class="section-header">
-                <div class="section-icon" style="background: linear-gradient(135deg, #7c3aed, #a855f7);">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                <div class="section-icon" style="background: linear-gradient(135deg, #dc2626, #ef4444);">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
                 <div>
                     <h2 class="section-title">SECCIÓN B: MÉTRICAS CUANTITATIVAS</h2>
@@ -227,175 +180,200 @@
                 </div>
             </div>
 
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">1. Diagnóstico de Volatilidad (IV vs HV)</h3>
-            
-            <p class="section-text">La volatilidad es la métrica de riesgo por excelencia en el trading de derivados. En la semana del 12 al 16 de enero, hemos observado una divergencia crítica que abre oportunidades estadísticas para los vendedores de primas.</p>
+            <p class="section-text">Esta sección constituye el núcleo analítico del reporte, transformando los datos crudos de las matrices en indicadores de probabilidad y valor relativo. La semana del 16 al 20 de febrero de 2026 se ha caracterizado por un fenómeno de "Gamma explosiva" combinada con una subestimación de la volatilidad implícita.</p>
+
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">1. Diagnóstico de Volatilidad (IV vs HV): El Paradigma del Riesgo Barato</h3>
+
+            <p class="section-text">El análisis de la volatilidad es la herramienta más potente para el trader de opciones. En GGAL, estamos presenciando una anomalía estadística de proporciones significativas.</p>
 
             <div class="metrics-grid">
                 <div class="metric-card">
-                    <h4>Volatilidad Histórica (HV)</h4>
+                    <h4>Volatilidad Histórica (HV) - El movimiento real</h4>
                     <ul>
-                        <li><strong>HV (20d): 36,45%.</strong> Esta cifra nos indica que, a pesar de la percepción de riesgo, el activo se ha movido de manera relativamente contenida en el último mes.</li>
-                        <li><strong>HV (3d): 46,55%.</strong> El repunte de cortísimo plazo refleja la turbulencia intradía observada entre el miércoles 14 y el viernes 16.</li>
+                        <li>HV (3d): <strong>86,90%</strong></li>
+                        <li>HV (5d): <strong>99,36%</strong></li>
+                        <li>HV (10d): <strong>73,17%</strong></li>
+                        <li>HV (20d): <strong>54,14%</strong></li>
+                        <li>HV (40d): <strong>44,58%</strong></li>
+                        <li>HV (60d): <strong>45,94%</strong></li>
+                        <li>HV (90d): <strong>67,47%</strong></li>
                     </ul>
                 </div>
                 <div class="metric-card">
-                    <h4>Volatilidad Implícita (IV) ATM</h4>
+                    <h4>Volatilidad Implícita (IV) - El movimiento esperado</h4>
                     <ul>
-                        <li>La IV promedio calculada sobre la base 7776 (la más cercana al dinero) se sitúa en el <strong>41,16%</strong>.</li>
+                        <li>IV ATM (Base 7351.5) promedio: <strong>35% - 40%</strong></li>
+                        <li>IV ATM Put (Base 7351.5) promedio: <strong>45,21%</strong></li>
                     </ul>
                 </div>
             </div>
+
+            <p class="section-text">El dato de HV (5d) al <strong>99,36%</strong> es extraordinario. Indica que, durante la última semana, el activo se ha movido con una violencia tal que, de anualizarse, implicaría oscilaciones de precio casi totales. Esta métrica es el resultado de los saltos de precio y la fuerte tendencia alcista observada tras la huelga del jueves.</p>
 
             <div class="insight-card" style="margin-top: 25px;">
                 <div class="insight-badge">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                     Veredicto IV vs HV
                 </div>
-                <p><strong>Veredicto (IV vs HV):</strong> Las opciones de GGAL se encuentran <strong>ligeramente caras</strong> en comparación con su movimiento real histórico de 20 días (Spread de +4,71 puntos porcentuales). Sin embargo, están operando con un descuento relativo frente a la volatilidad de cortísima duración (3d).</p>
-                <p style="margin-top: 15px;"><strong>Interpretación:</strong> El mercado está "pagando por adelantado" un movimiento que el activo todavía no ha realizado de forma sostenida. Este escenario de IV > HV20 favorece las <strong>estrategias de venta de volatilidad</strong>, ya que la tendencia probabilística es que la IV colapse hacia la HV una vez que se disipe la incertidumbre de la semana.</p>
+                <p><strong>Opciones Extremadamente Baratas (Comprar Volatilidad)</strong></p>
+                <p style="margin-top: 15px;">Al comparar la IV (promedio ~40%) frente a la HV20 (54,14%) y, más dramáticamente, frente a la HV5 (99,36%), la conclusión es inequívoca: el mercado de opciones no está cobrando lo suficiente por el riesgo de movimiento que el papel está demostrando.</p>
+                <p style="margin-top: 15px;"><strong>Acción Recomendada:</strong> Estrategias compradoras de volatilidad (Long Straddles o Strangles) o simplemente la compra directa de opciones para cobertura resultan baratas en términos relativos. Los lanzadores están asumiendo un riesgo "Gamma" altísimo por una prima (Theta) que no compensa la probabilidad de ser barridos por un movimiento direccional violento.</p>
             </div>
 
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 35px 0 15px 0;">2. Lectura del Skew de Volatilidad (La Sonrisa de Volatilidad)</h3>
-            
-            <p class="section-text">Al analizar la curva de volatilidad a través de los diferentes strikes para el vencimiento de febrero, encontramos un sesgo defensivo marcado.</p>
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">2. Lectura del Skew (Sonrisa de Volatilidad): El Miedo supera a la Codicia</h3>
 
-            <div class="skew-grid">
-                <div class="skew-item puts">
-                    <span class="skew-label">Lado del Miedo (Puts OTM)</span>
-                    <span class="skew-value">Base 7152 opera con IV del <strong>52,00%</strong></span>
-                    <p class="skew-desc">Los inversores están pagando primas excesivas por seguros contra caídas profundas.</p>
+            <p class="section-text">El Skew de volatilidad nos indica si el mercado está pagando más por protegerse de caídas o por apostar a subas. En GGAL, la curva está fuertemente sesgada hacia los Puts.</p>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tipo de Strike</th>
+                                <th>Strike</th>
+                                <th>IV (Last VI)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="interpretation-cell">OTM Put (Miedo)</td>
+                                <td><span class="strike-tag put">$6.151,50</span></td>
+                                <td>48,44%</td>
+                            </tr>
+                            <tr>
+                                <td class="interpretation-cell">ATM Call (Neutral)</td>
+                                <td><span class="strike-tag otm">$7.351,50</span></td>
+                                <td>35,19%</td>
+                            </tr>
+                            <tr>
+                                <td class="interpretation-cell">OTM Call (Codicia)</td>
+                                <td><span class="strike-tag otm">$8.228,20</span></td>
+                                <td>36,00%</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="skew-item calls">
-                    <span class="skew-label">Lado de la Codicia (Calls OTM)</span>
-                    <span class="skew-value">Base 8530 opera con IV del <strong>38,65%</strong></span>
-                    <p class="skew-desc">El mercado está "baratizando" las apuestas alcistas explosivas.</p>
-                </div>
-            </div>
 
             <div class="highlight-box warning" style="margin-top: 25px;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <p><strong>Comparativa Visual:</strong> La "Sonrisa" está deformada hacia la izquierda (Skew descendente). Esto significa que el mercado percibe un riesgo asimétrico: teme mucho más una corrección hacia los $7.000 que lo que desea un rally hacia los $9.000. Para el analista cuantitativo, esto sugiere que el costo de las coberturas es muy alto, mientras que las estrategias de "income" mediante la venta de Puts caros (Bull Put Spread) o el aprovechamiento de Calls baratos para coberturas (Tapas) son matemáticamente eficientes.</p>
+                <p><strong>Interpretación Visual y Cuantitativa:</strong> El diferencial de IV entre el Put OTM y el Call OTM es de <strong>12,44 puntos porcentuales</strong>. Esto significa que los operadores están mucho más preocupados por una caída hacia los $6.000 que entusiasmados por una suba hacia los $8.200. A pesar de que el papel está subiendo, el "miedo" cotiza a 48% de volatilidad, mientras que la "codicia" cotiza solo al 36%. Para el trader sofisticado, esto representa una oportunidad para vender Puts caros (capturando Skew) y comprar Calls baratos (aprovechando la baja IV direccional).</p>
             </div>
 
-            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 35px 0 15px 0;">3. Rangos Probabilísticos de Movimiento</h3>
-            
-            <p class="section-text">Utilizando modelos de movimiento browniano geométrico y la IV ponderada actual, proyectamos los siguientes niveles de desviación estándar:</p>
+            <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">3. Rangos Probabilísticos</h3>
+
+            <p class="section-text">Utilizando el modelo de movimiento browniano geométrico con el spot en $7.175, una IV ponderada del 38% y los plazos correspondientes, se establecen los siguientes perímetros de seguridad estadística.</p>
 
             <div class="analysis-block">
                 <div class="analysis-header calls">
                     <div class="analysis-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
                     </div>
-                    <h4>A. Rango para la próxima semana (Cierre 23/01):</h4>
+                    <h4>Para dentro de 1 semana (Próximo informe)</h4>
                 </div>
-                <p class="analysis-intro">Con una IV del 41% y un spot de $7.765, el mercado asigna una probabilidad del 68,2% (1 Sigma) a que el precio se mantenga dentro del siguiente rango:</p>
+                <p class="analysis-intro">Considerando 5 ruedas operativas (7 días naturales):</p>
                 <ul style="list-style: disc; margin: 15px 0 15px 25px; font-size: 0.95rem; line-height: 1.7; color: var(--saas-text);">
-                    <li><strong>Límite Superior: $8.110.</strong></li>
-                    <li><strong>Límite Inferior: $7.420.</strong></li>
+                    <li>Rango esperado (1 Desvío Estándar - 68% prob.): Entre <strong>$6.805</strong> y <strong>$7.545</strong>.</li>
+                    <li>Rango esperado (2 Desvíos Estándar - 95% prob.): Entre <strong>$6.435</strong> y <strong>$7.915</strong>.</li>
                 </ul>
-                <p style="font-size: 0.95rem; line-height: 1.7; color: var(--saas-text);"><strong>Insight Operativo:</strong> Cualquier posición que asuma un cierre por encima de $8.110 el próximo viernes tiene menos del 16% de probabilidad de éxito estadístico. Esto refuerza la tesis de vender Calls en la zona de $8.400/$8.500.</p>
             </div>
 
             <div class="analysis-block">
                 <div class="analysis-header puts">
                     <div class="analysis-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
                     </div>
-                    <h4>B. Rango para el Ejercicio (Vencimiento 20/02 - 33 días):</h4>
+                    <h4>Para la fecha de ejercicio (17 de abril - 54 días)</h4>
                 </div>
-                <p class="analysis-intro">Considerando el plazo remanente de 33 días y la IV actual:</p>
                 <ul style="list-style: disc; margin: 15px 0 15px 25px; font-size: 0.95rem; line-height: 1.7; color: var(--saas-text);">
-                    <li><strong>Rango Esperado (1 Sigma):</strong> Entre <strong>$7.025 y $8.505</strong>.</li>
-                    <li><strong>Rango Extendido (2 Sigmas - 95% Probabilidad):</strong> Entre <strong>$6.450 y $9.080</strong>.</li>
+                    <li>Rango esperado (1 Desvío Estándar - 68% prob.): Entre <strong>$6.140</strong> y <strong>$8.210</strong>.</li>
+                    <li>Rango esperado (2 Desvíos Estándar - 95% prob.): Entre <strong>$5.105</strong> y <strong>$9.245</strong>.</li>
                 </ul>
-                <p style="font-size: 0.95rem; line-height: 1.7; color: var(--saas-text);"><strong>Análisis de Probabilidad de Ejercicio:</strong> Estadísticamente, existe un <strong>84% de probabilidad</strong> de que GGAL cierre el ejercicio de febrero por debajo de los <strong>$8.505</strong>. Esto convierte a las bases superiores a los $8.800 en "activos tóxicos" para los compradores y en "fuentes de renta" para los lanzadores cubiertos.</p>
             </div>
+
+            <div class="insight-card" style="margin-top: 25px;">
+                <div class="insight-badge">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    Insight Operativo
+                </div>
+                <p>El mercado asigna una probabilidad muy baja (<16%) a que el papel supere los <strong>$7.545</strong> la próxima semana. Sin embargo, dado que la volatilidad histórica es el doble que la implícita, estas fronteras estadísticas son más frágiles de lo habitual. Un quiebre de los <strong>$7.545</strong> activaría un escenario de "short gamma squeeze", obligando a los lanzadores a recomprar posiciones frenéticamente, alimentando la suba.</p>
+            </div>
+
         </div>
     </section>
 
-    <!-- Sección C: Idea de Trading -->
+    <!-- Estrategia -->
     <section class="insights-section">
         <div class="section-container">
             <div class="section-header">
-                <div class="section-icon" style="background: linear-gradient(135deg, #dc2626, #ef4444);">
+                <div class="section-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 </div>
                 <div>
-                    <h2 class="section-title">SECCIÓN C: IDEA DE TRADING ESTRATÉGICA (MIRAS A 7 DÍAS)</h2>
-                    <p class="section-subtitle">RIESGO: Moderado/Alto</p>
+                    <h2 class="section-title">SECCIÓN C: IDEA DE TRADING (Matemática Aplicada)</h2>
+                    <p class="section-subtitle">RIESGO: Moderado</p>
                 </div>
             </div>
-
-            <p class="section-text">Basado en la convergencia de:</p>
-            <ol style="list-style: decimal; margin: 0 0 25px 25px; font-size: 0.95rem; line-height: 1.8; color: var(--saas-text);">
-                <li><strong>IV superior a HV20</strong> (+4,7%), sugiriendo que las primas están sobrevaloradas.</li>
-                <li><strong>Tendencia técnica de consolidación</strong> con sesgo bajista tras fallar en romper los $7.870.</li>
-                <li><strong>Skew defensivo</strong> que infla el costo de los Puts y deprime la IV de los Calls lejanos.</li>
-            </ol>
-
+            <p class="section-text">Dada la configuración de una IV barata frente a la HV alta, un Skew sesgado hacia los Puts, y un soporte técnico en la zona de los $6.850 - $7.000, la oportunidad matemática para los próximos 7 a 15 días es clara.</p>
             <div class="strategy-card">
                 <div class="strategy-header">
-                    <h3>Estrategia Sugerida: Bear Call Spread (Spread de Crédito Bajista)</h3>
+                    <h3>Estrategia Sugerida: Bull Put Spread (Spread de Crédito Alcista)</h3>
                 </div>
-                <p class="strategy-desc">Esta estructura busca capturar el decaimiento temporal (Theta) y la compresión de volatilidad (Vega) mientras se define el riesgo máximo ante un posible rebote inesperado.</p>
-                
+                <p class="strategy-desc">Esta estrategia busca capitalizar la IV inflada de los Puts y el sesgo de Skew, mientras se limita el riesgo ante la volatilidad extrema.</p>
                 <div class="strategy-legs">
                     <div class="leg sell">
                         <div class="leg-header">
                             <span class="leg-action">VENDER (-)</span>
-                            <span class="leg-strike">Call Strike 7930 (GFGC7930FE)</span>
+                            <span class="leg-strike">Put Base GFGV69282A (Abril)</span>
                         </div>
                         <div class="leg-details">
-                            <p><strong>Precio de Referencia:</strong> $390,00.</p>
-                            <p><strong>Racional:</strong> Es un nivel psicológico de resistencia operado con alto volumen. Tiene un valor extrínseco elevado que se erosionará rápidamente si GGAL lateraliza o baja.</p>
+                            <p><strong>Precio de Referencia:</strong> $265,00 (Ask)</p>
+                            <p><strong>Racional:</strong> Esta base tiene una IV del 47,19%. Estamos vendiendo "miedo caro" en un nivel que se encuentra por debajo del precio de cierre y cerca de un soporte de volumen importante.</p>
                         </div>
                     </div>
                     <div class="leg buy">
                         <div class="leg-header">
                             <span class="leg-action">COMPRAR (+)</span>
-                            <span class="leg-strike">Call Strike 8230 (GFGC8230FE)</span>
+                            <span class="leg-strike">Put Base GFGV61515A (Abril)</span>
                         </div>
                         <div class="leg-details">
-                            <p><strong>Precio de Referencia:</strong> $257,50.</p>
-                            <p><strong>Racional:</strong> Actúa como "tapa" o seguro. Define el riesgo máximo de la operación ante un "cisne negro" positivo y reduce el requerimiento de margen en la cuenta comitente.</p>
+                            <p><strong>Precio de Referencia:</strong> $84,512 (Bid)</p>
+                            <p><strong>Racional:</strong> Actúa como la "tapa" o seguro de la posición. Define el riesgo máximo y reduce sustancialmente el margen requerido por el mercado. Su IV es aún más alta (48,44%), pero su costo nominal es bajo.</p>
                         </div>
                     </div>
                 </div>
-
-                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">Métricas de la Operación (por lote):</h4>
-                
+                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">Análisis de la Operación</h4>
                 <div class="metrics-operation">
                     <div class="metric-op">
-                        <span class="metric-op-label">Crédito Neto Recibido (Cobro inicial)</span>
-                        <span class="metric-op-value positive">$390,00 - $257,50 = $132,50</span>
+                        <span class="metric-op-label">Crédito Neto (Cobro Inicial)</span>
+                        <span class="metric-op-value positive">$180,49 por acción</span>
                     </div>
                     <div class="metric-op">
-                        <span class="metric-op-label">Riesgo Máximo (Diferencia de strikes $300,00) - (Crédito $132,50)</span>
-                        <span class="metric-op-value negative">= $167,50</span>
+                        <span class="metric-op-label">Máxima Ganancia</span>
+                        <span class="metric-op-value positive">$180,49 (100% de la prima si GGAL cierra > $6.928,20)</span>
                     </div>
                     <div class="metric-op">
-                        <span class="metric-op-label">Punto de Equilibrio (Break-Even): Strike vendido $7.930 + crédito $132,50</span>
-                        <span class="metric-op-value">= $8.062,50</span>
+                        <span class="metric-op-label">Punto de Equilibrio (Break-even)</span>
+                        <span class="metric-op-value">$6.747,71</span>
                     </div>
                     <div class="metric-op">
-                        <span class="metric-op-label">Retorno sobre Riesgo (ROR): 79,1% en caso de que el papel cierre por debajo de $7.930 al finalizar la semana.</span>
-                        <span class="metric-op-value positive">79,1%</span>
+                        <span class="metric-op-label">Riesgo Máximo</span>
+                        <span class="metric-op-value negative">$596,21</span>
+                    </div>
+                    <div class="metric-op">
+                        <span class="metric-op-label">Retorno sobre Riesgo (ROR)</span>
+                        <span class="metric-op-value positive">~30,2%</span>
                     </div>
                 </div>
-
-                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">Por qué funciona matemáticamente:</h4>
-                
+                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--saas-primary); margin: 25px 0 15px 0;">Por qué funciona matemáticamente</h4>
                 <ul style="list-style: disc; margin: 0 0 20px 25px; font-size: 0.95rem; line-height: 1.8; color: var(--saas-text);">
-                    <li>Estamos vendiendo volatilidad en un nivel donde la IV es del 41,27%, financiando nuestra protección con una base cuya IV es del 40,28%.</li>
-                    <li>El punto de equilibrio ($8.062,50) se encuentra cerca del límite superior del rango probabilístico de 1 Sigma para la próxima semana ($8.110), otorgándonos una ventaja estadística del <strong>~80% de probabilidad de éxito</strong>.</li>
-                    <li>Incluso si el papel sube un 3% en la semana, la posición mantendría ganancias debido a que el paso del tiempo (Theta) compensará el movimiento del subyacente (Delta negativo).</li>
+                    <li>Estamos vendiendo volatilidad en el lado de la curva donde es más cara (Puts) y comprándola donde es más barata (Calls, si quisiéramos armar un combo).</li>
+                    <li>El Punto de Equilibrio ($6.747) se encuentra un 6% por debajo del precio actual, ofreciendo un margen de seguridad considerable ante la volatilidad intradiaria.</li>
+                    <li>Si la HV del 99% comienza a comprimirse hacia niveles más normales, el "Vega" a nuestro favor acelerará las ganancias incluso sin movimiento del precio.</li>
                 </ul>
             </div>
         </div>
     </section>
 
-    <!-- Sección D: Conclusión -->
+    <!-- Conclusión -->
     <section class="insights-section" style="background: var(--saas-light);">
         <div class="section-container">
             <div class="section-header">
@@ -406,17 +384,15 @@
                     <h2 class="section-title">SECCIÓN D: CONCLUSIÓN RÁPIDA Y CONCISA</h2>
                 </div>
             </div>
-
-            <p class="section-text">La semana del 12 al 16 de enero de 2026 ha marcado el fin de la inercia alcista lineal para GGAL en pesos. El mercado ha entrado en una fase de "reacomodamiento técnico" donde el impacto de los dividendos y la fortaleza del ancla cambiaria del BCRA están forzando una compresión de múltiplos.</p>
-
+            <p class="section-text">La semana del 16 al 20 de febrero de 2026 ha marcado un punto de inflexión para GGAL. El activo ha absorbido las malas noticias macroeconómicas y la agitación social con una firmeza notable, cerrando en máximos locales. Sin embargo, el mercado de derivados muestra una complacencia peligrosa en el precio de las primas (IV), no reflejando la agitación real de la acción (HV).</p>
             <div class="levels-grid">
                 <div class="level-card resistance">
                     <div class="level-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
                     </div>
                     <div class="level-content">
-                        <span class="level-label">Resistencia Táctica</span>
-                        <span class="level-value">$7.870 (Máximo semanal) / <strong>$7.930</strong> (Call Wall)</span>
+                        <span class="level-label">Resistencia</span>
+                        <span class="level-value"><strong>$7.350</strong> (Inmediata) / <strong>$7.528</strong> (Muralla Call)</span>
                     </div>
                 </div>
                 <div class="level-card support">
@@ -424,20 +400,18 @@
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
                     </div>
                     <div class="level-content">
-                        <span class="level-label">Soporte Táctico</span>
-                        <span class="level-value">$7.680 (Mínimo del viernes) / <strong>$7.530</strong> (Put Wall defensivo)</span>
+                        <span class="level-label">Soporte</span>
+                        <span class="level-value"><strong>$7.000</strong> (Psicológico) / <strong>$6.928</strong> (Muralla Put) / <strong>$6.855</strong> (Mínimo de la rueda)</span>
                     </div>
                 </div>
             </div>
-
             <div class="insight-card" style="margin-top: 25px;">
                 <div class="insight-badge">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
                     Veredicto Final
                 </div>
-                <p>El escenario base es de lateralización con sesgo bajista. El "Time Decay" es el enemigo de los compradores de opciones. La recomendación es evitar compras directas de Calls OTM y priorizar estructuras de crédito o lanzamientos cubiertos para capitalizar el exceso de valor extrínseco en las bases superiores a $8.000. El monitoreo de la acumulación de reservas del BCRA y el sentimiento en Wall Street (S&P 500) serán los catalizadores que podrían invalidar este escenario de rango.</p>
+                <p>El tiempo (Theta) es el aliado de quien sepa vender el miedo exagerado en los Puts, pero la dirección (Delta) y la aceleración (Gamma) son el peligro inminente para los lanzadores descubiertos. La estrategia ganadora consiste en administrar los rangos entre <strong>$6.800</strong> y <strong>$7.500</strong>, aprovechando que el mercado local está ponderando los flujos positivos de reservas por encima de la incertidumbre inflacionaria.</p>
             </div>
-
             <div class="highlight-box warning" style="margin-top: 20px;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                 <p><strong>Disclaimer:</strong> Operar con opciones conlleva riesgos significativos y puede resultar en la pérdida total del capital invertido. Este informe es de carácter educativo y no constituye asesoramiento financiero personalizado.</p>
@@ -650,4 +624,7 @@ body { overflow-x: hidden; }
 .ggal-analisis-estatico .level-label { font-size: 0.8rem; color: var(--saas-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
 .ggal-analisis-estatico .level-value { font-size: 0.95rem; color: var(--saas-text); line-height: 1.5; }
 .ggal-analisis-estatico .level-value strong { color: var(--saas-primary); }
+</style>
+<style>
+.ggal-analisis-estatico .hero-section { margin-top: 0 !important; padding-top: 40px !important; }
 </style>

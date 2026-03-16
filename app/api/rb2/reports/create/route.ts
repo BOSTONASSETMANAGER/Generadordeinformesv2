@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         category,
         name: name || `Nuevo Informe - ${new Date().toLocaleDateString()}`,
-        status: 'processing',
+        status: 'draft',
       })
       .select()
       .single()
@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
           user_id: user.id,
           file_name: fileName,
           file_type: fileType,
+          source_type: fileType || 'pdf',
           file_url: fileUrl,
           file_size: fileSize,
           storage_path: storagePath,

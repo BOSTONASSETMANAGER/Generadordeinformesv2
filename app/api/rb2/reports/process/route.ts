@@ -3,15 +3,23 @@ import { createServerClient } from '@/lib/supabase/server'
 import { runPipeline } from '@/lib/pipeline'
 import { MIN_SIMILARITY_SCORE } from '@/lib/template-similarity'
 
+export const maxDuration = 300
+
 /**
- * Pipeline: Extract → Select Template → Assemble → Validate → Save
- * 
- * This endpoint orchestrates the AI agents:
- * 1. Agent A (OpenAI): Extract structured JSON from PDF/images
- * 2. Template Loader: Select best matching template from /informes premium ejemplos/
- * 3. Agent B (Claude): Clone template and inject extracted content
- * 4. Similarity Scorer: Validate HTML fidelity to template
- * 5. Save: Store extraction, version, and meta in rb2 schema
+ * Async Pipeline: fires the pipeline in the background and returns immediately.
+ * The editor polls /api/rb2/reports/status to pick up results.
+ *
+ * Flow:
+ * 1. Validate request + auth
+ * 2. Save PDF source to DB
+ * 3. Set report status = 'processing'
+ * 4. Fire pipeline in background (no await)
+ * 5. Return { status: 'processing' } immediately
+ *
+ * The background pipeline:
+ * - Runs extraction (text-only, fast) → structuring → rendering → validation
+ * - Saves extraction, version, and final status to DB
+ * - Editor picks up results via polling
  */
 
 export async function POST(request: NextRequest) {
@@ -75,19 +83,18 @@ export async function POST(request: NextRequest) {
 
     if (pdfBase64) {
       sourceFileName = body.sourceFileName || 'report.pdf'
-      const pdfSize = Math.round((pdfBase64.length * 3) / 4) // approximate decoded size
+      const pdfSize = Math.round((pdfBase64.length * 3) / 4)
 
       try {
-        // Check if source already exists for this report
         const existingSource = sources?.find((s: any) => s.report_id === reportId)
 
         if (existingSource) {
-          // Update existing source with new PDF
           const { error: updateError } = await rb2
             .from('report_sources')
             .update({
               file_name: sourceFileName,
               file_type: 'pdf',
+              source_type: 'pdf',
               file_size: pdfSize,
               pdf_base64: pdfBase64,
               status: 'ready',
@@ -100,7 +107,6 @@ export async function POST(request: NextRequest) {
             console.log(`[process] PDF saved to report_sources (updated), size: ${(pdfSize / 1024).toFixed(0)}KB`)
           }
         } else {
-          // Insert new source
           const { error: insertError } = await rb2
             .from('report_sources')
             .insert({
@@ -108,7 +114,9 @@ export async function POST(request: NextRequest) {
               user_id: user.id,
               file_name: sourceFileName,
               file_type: 'pdf',
+              source_type: 'pdf',
               file_size: pdfSize,
+              storage_path: `inline:${reportId}/${sourceFileName}`,
               pdf_base64: pdfBase64,
               status: 'ready',
             })
@@ -125,179 +133,146 @@ export async function POST(request: NextRequest) {
     }
 
     // ============================================
-    // RUN FULL PIPELINE
+    // RUN PIPELINE (awaited — fast with text-only extraction)
     // ============================================
     const textContent = pdfTextContent || ''
-    if (!textContent) {
-      console.warn('[process] No pdfTextContent provided — pipeline will use empty content')
-    }
+    const currentVersion = (report.current_version || 0) + 1
+    const userId = user.id
+    const sourceId = sources?.[0]?.id || null
 
     console.log(`[process] Starting pipeline for report ${reportId}`)
-    console.log(`[process] User: ${user.id}, Sources: ${sources?.length || 0}`)
 
-    const pipelineResult = await runPipeline(
-      {
-        reportId,
-        userId: user.id,
-        sourceFileUrl: sources?.[0]?.file_url || '',
-        sourceFileName,
-        reportName: report.name,
-        pdfBase64: pdfBase64 || undefined,
-      },
-      textContent
-    )
-
-    // ============================================
-    // SAVE EXTRACTION to rb2.extractions
-    // ============================================
-    let extraction = null
-    if (pipelineResult.extractedJson) {
-      const extractedJson = pipelineResult.extractedJson as any
-      const { data: extractionData, error: extractionError } = await rb2
-        .from('extractions')
-        .insert({
-          report_id: reportId,
-          source_id: sources?.[0]?.id || null,
-          user_id: user.id,
-          extracted_json: extractedJson,
-          issues: extractedJson.issues || [],
-          needs_review: extractedJson.needs_review || false,
-          validation_issues: pipelineResult.meta.similarity_diagnostics || [],
-        })
-        .select()
-        .single()
-
-      if (extractionError) {
-        console.error('[process] Error saving extraction:', extractionError)
-      } else {
-        extraction = extractionData
-        console.log(`[process] Extraction saved: ${extractionData?.id}`)
-      }
-    }
-
-    // ============================================
-    // DETERMINE STATUS based on validation + similarity
-    // ============================================
-    const similarityScore = pipelineResult.meta.template_similarity_score
-    const templateValidation = pipelineResult.meta.template_validation
-    let finalStatus: string
-
-    if (!pipelineResult.success) {
-      finalStatus = 'error'
-    } else if (templateValidation && !templateValidation.passed) {
-      finalStatus = 'error'
-      console.error(`[process] Template validation FAILED → status=error`)
-    } else if (similarityScore !== null && similarityScore < MIN_SIMILARITY_SCORE) {
-      finalStatus = 'error'
-      pipelineResult.warnings.push(
-        `Template similarity score ${similarityScore} is below minimum ${MIN_SIMILARITY_SCORE}. Status set to error.`
+    try {
+      const pipelineResult = await runPipeline(
+        {
+          reportId,
+          userId,
+          sourceFileUrl: sources?.[0]?.file_url || '',
+          sourceFileName,
+          reportName: report.name,
+          pdfBase64: pdfBase64 || undefined,
+        },
+        textContent
       )
-      console.warn(`[process] Similarity score ${similarityScore} < ${MIN_SIMILARITY_SCORE} → status=error`)
-    } else {
-      finalStatus = 'ready'
-    }
 
-    // ============================================
-    // SAVE VERSION to rb2.report_versions
-    // ============================================
-    const currentVersion = (report.current_version || 0) + 1
-    let version = null
+      // Save extraction
+      if (pipelineResult.extractedJson) {
+        const extractedJson = pipelineResult.extractedJson as any
+        const { error: extractionError } = await rb2
+          .from('extractions')
+          .insert({
+            report_id: reportId,
+            source_id: sourceId,
+            user_id: userId,
+            extracted_json: extractedJson,
+            issues: extractedJson.issues || [],
+            needs_review: extractedJson.needs_review || false,
+            validation_issues: pipelineResult.meta.similarity_diagnostics || [],
+          })
 
-    const hasHtml = pipelineResult.htmlFinal || (finalStatus === 'error' && pipelineResult.extractedJson)
-    if (hasHtml) {
-      const versionMeta: Record<string, unknown> = {
-        ...pipelineResult.meta,
-        template_file: pipelineResult.meta.template_file,
-        template_hash: pipelineResult.meta.template_hash,
-        html_hash: pipelineResult.meta.html_hash,
-        template_similarity_score: similarityScore,
-        final_status: finalStatus,
-      }
-
-      // If validation failed, store change_log with reasons
-      if (templateValidation && !templateValidation.passed) {
-        versionMeta.change_log = {
-          reason: templateValidation.reasons.join('; '),
-          missing_classes: templateValidation.missingClasses,
-          validation_passed: false,
+        if (extractionError) {
+          console.error('[process] Error saving extraction:', extractionError)
+        } else {
+          console.log(`[process] Extraction saved`)
         }
       }
 
-      const { data: versionData, error: versionError } = await rb2
-        .from('report_versions')
-        .insert({
-          report_id: reportId,
-          user_id: user.id,
-          version_number: currentVersion,
-          html_content: pipelineResult.htmlFinal || '',
-          report_data: pipelineResult.extractedJson,
-          warnings: pipelineResult.warnings,
-          meta: versionMeta,
-        })
-        .select()
-        .single()
+      // Determine final status
+      const similarityScore = pipelineResult.meta.template_similarity_score
+      const templateValidation = pipelineResult.meta.template_validation
+      let finalStatus: string
 
-      if (versionError) {
-        console.error('[process] Error saving version:', versionError)
-        return NextResponse.json(
-          { error: 'Failed to save version', details: versionError.message },
-          { status: 500 }
-        )
+      if (!pipelineResult.success) {
+        finalStatus = 'error'
+      } else if (templateValidation && !templateValidation.passed) {
+        finalStatus = 'error'
+        console.error(`[process] Template validation FAILED → status=error`)
+      } else if (similarityScore !== null && similarityScore < MIN_SIMILARITY_SCORE) {
+        finalStatus = 'error'
+        console.warn(`[process] Similarity ${similarityScore} < ${MIN_SIMILARITY_SCORE} → status=error`)
+      } else {
+        finalStatus = 'ready'
       }
 
-      version = versionData
-      console.log(`[process] Version saved: ${versionData?.id}, v${currentVersion}`)
+      // Save version
+      const hasHtml = pipelineResult.htmlFinal || (finalStatus === 'error' && pipelineResult.extractedJson)
+      if (hasHtml) {
+        const versionMeta: Record<string, unknown> = {
+          ...pipelineResult.meta,
+          template_similarity_score: similarityScore,
+          final_status: finalStatus,
+        }
+
+        if (templateValidation && !templateValidation.passed) {
+          versionMeta.change_log = {
+            reason: templateValidation.reasons.join('; '),
+            missing_classes: templateValidation.missingClasses,
+            validation_passed: false,
+          }
+        }
+
+        const { error: versionError } = await rb2
+          .from('report_versions')
+          .insert({
+            report_id: reportId,
+            user_id: userId,
+            version_number: currentVersion,
+            html_content: pipelineResult.htmlFinal || '',
+            report_data: pipelineResult.extractedJson,
+            warnings: pipelineResult.warnings,
+            meta: versionMeta,
+          })
+
+        if (versionError) {
+          console.error('[process] Error saving version:', versionError)
+        } else {
+          console.log(`[process] Version v${currentVersion} saved`)
+        }
+      }
+
+      // Update report status
+      const reportUpdate: Record<string, unknown> = {
+        status: finalStatus,
+        current_version: currentVersion,
+        updated_at: new Date().toISOString(),
+      }
+
+      if (pipelineResult.reportTitle) {
+        reportUpdate.name = pipelineResult.reportTitle
+      }
+
+      await rb2
+        .from('reports')
+        .update(reportUpdate)
+        .eq('id', reportId)
+
+      console.log(`[process] Report ${reportId} → status=${finalStatus}, version=v${currentVersion}`)
+      console.log(`[process] Timings: extract=${pipelineResult.meta.extraction_duration_ms}ms, structure=${pipelineResult.meta.structurer_duration_ms}ms, render=${pipelineResult.meta.render_duration_ms}ms`)
+
+      // Return success — editor polling will pick up the saved results
+      return NextResponse.json({
+        status: finalStatus,
+        reportId,
+        success: pipelineResult.success,
+      })
+
+    } catch (pipelineError) {
+      const errMsg = pipelineError instanceof Error ? pipelineError.message : String(pipelineError)
+      console.error(`[process] Pipeline failed for ${reportId}: ${errMsg}`)
+
+      // Mark report as error in DB
+      await rb2
+        .from('reports')
+        .update({ status: 'error', updated_at: new Date().toISOString() })
+        .eq('id', reportId)
+        .catch((e: any) => console.error('[process] Failed to update error status:', e))
+
+      return NextResponse.json({
+        status: 'error',
+        reportId,
+        error: errMsg,
+      })
     }
-
-    // ============================================
-    // UPDATE REPORT STATUS
-    // ============================================
-    // Build update payload — include extracted title if available
-    const reportUpdate: Record<string, unknown> = {
-      status: finalStatus,
-      current_version: currentVersion,
-      updated_at: new Date().toISOString(),
-    }
-
-    if (pipelineResult.reportTitle) {
-      reportUpdate.name = pipelineResult.reportTitle
-      console.log(`[process] Updating report name to: "${pipelineResult.reportTitle}"`)
-    }
-
-    await rb2
-      .from('reports')
-      .update(reportUpdate)
-      .eq('id', reportId)
-
-    console.log(`[process] Report ${reportId} → status=${finalStatus}, version=${currentVersion}`)
-    console.log(`[process] Pipeline meta:`, JSON.stringify({
-      reportId,
-      templateFile: pipelineResult.meta.template_file,
-      templateHash: pipelineResult.meta.template_hash,
-      htmlHash: pipelineResult.meta.html_hash,
-      validate: templateValidation?.passed ? 'passed' : 'failed',
-      missingClasses: templateValidation && !templateValidation.passed ? templateValidation.missingClasses.slice(0, 10) : [],
-      similarity_score: similarityScore,
-      extracted_json_size: pipelineResult.meta.extracted_json_size,
-      html_size: pipelineResult.meta.html_size,
-      extraction_ms: pipelineResult.meta.extraction_duration_ms,
-      assembly_ms: pipelineResult.meta.assembly_duration_ms,
-    }))
-
-    return NextResponse.json({
-      success: pipelineResult.success,
-      report: { ...report, status: finalStatus, current_version: currentVersion },
-      extraction,
-      version,
-      pipeline: {
-        template_chosen: pipelineResult.templateChosen,
-        similarity_score: similarityScore,
-        similarity_details: pipelineResult.similarityResult?.details || null,
-        diagnostics: pipelineResult.similarityResult?.diagnostics || [],
-        warnings: pipelineResult.warnings,
-        meta: pipelineResult.meta,
-      },
-    })
   } catch (error) {
     console.error('[process] Unhandled error:', error)
     return NextResponse.json(

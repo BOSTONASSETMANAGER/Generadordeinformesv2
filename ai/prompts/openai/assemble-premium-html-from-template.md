@@ -81,6 +81,16 @@ Each section in the template follows a specific container pattern:
 - DO NOT remove analysis-header divs with their icons.
 - PRESERVE all SVG icons exactly as they are in the template.
 
+## EJEMPLOS_VALIDADOS (Golden Templates)
+Sometimes you will receive one or more `EJEMPLOS_VALIDADOS` — these are previously generated reports that were approved by the user. They represent the **quality standard** you should aim for.
+
+Rules for using validated examples:
+- **Clone the TEMPLATE_HTML structure** — the examples are for quality reference only, NOT for structural cloning.
+- Use examples to understand the **tone, level of detail, and formatting** the user expects.
+- If the example shows how a specific section was filled (e.g., flow-events with detailed analysis), match that level of detail.
+- If the example and template differ in structure, ALWAYS follow the TEMPLATE_HTML structure.
+- Do NOT copy text from examples — use PDF content VERBATIM.
+
 ## Output format
 Return ONLY valid JSON (no markdown fences):
 

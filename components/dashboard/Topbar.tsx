@@ -1,6 +1,6 @@
 "use client"
 
-import { Save, CheckCircle, Send, AlertCircle } from "lucide-react"
+import { CheckCircle, CheckCircle2, Copy, Check, AlertCircle, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
@@ -10,18 +10,22 @@ interface TopbarProps {
   breadcrumbs: BreadcrumbItem[]
   status: 'draft' | 'pending_review' | 'published'
   pendingIssues: number
-  onSaveDraft: () => void
-  onValidate: () => void
-  onPublish: () => void
+  onApprove: () => void
+  onCopyHtml: () => void
+  isApproving?: boolean
+  isCopied?: boolean
+  hasHtml?: boolean
 }
 
 export function Topbar({
   breadcrumbs,
   status,
   pendingIssues,
-  onSaveDraft,
-  onValidate,
-  onPublish,
+  onApprove,
+  onCopyHtml,
+  isApproving,
+  isCopied,
+  hasHtml,
 }: TopbarProps) {
   const statusConfig = {
     draft: { label: 'Draft Mode', variant: 'warning' as const },
@@ -73,17 +77,32 @@ export function Topbar({
 
         {/* Right: Actions */}
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={onSaveDraft}>
-            <Save className="w-4 h-4 mr-2" />
-            Save Draft
-          </Button>
-          <Button variant="secondary" size="sm" onClick={onValidate}>
-            <CheckCircle className="w-4 h-4 mr-2" />
-            Validate & Sign Off
-          </Button>
-          <Button size="sm" onClick={onPublish}>
-            <Send className="w-4 h-4 mr-2" />
-            Publish Report
+          {status !== 'published' && hasHtml && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onApprove}
+              disabled={isApproving}
+            >
+              {isApproving ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <CheckCircle2 className="w-4 h-4 mr-2" />
+              )}
+              {isApproving ? 'Aprobando...' : 'Aprobar y guardar'}
+            </Button>
+          )}
+          <Button
+            size="sm"
+            onClick={onCopyHtml}
+            disabled={!hasHtml}
+          >
+            {isCopied ? (
+              <Check className="w-4 h-4 mr-2" />
+            ) : (
+              <Copy className="w-4 h-4 mr-2" />
+            )}
+            {isCopied ? 'Copiado!' : 'Publicar'}
           </Button>
         </div>
       </div>

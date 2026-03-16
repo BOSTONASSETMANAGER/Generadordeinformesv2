@@ -1,6 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
+import { getGoldenTemplatesPrioritized, incrementGoldenUsage } from './golden-templates'
+import type { GoldenTemplate } from './golden-templates'
 
 export interface TemplateFile {
   fileName: string
@@ -19,6 +21,13 @@ export interface TemplateSelection {
   fileName: string
   html: string
   hash: string
+}
+
+export interface TemplateSelectionResult {
+  primary: TemplateSelection
+  goldenExamples: TemplateSelection[]
+  source: 'golden' | 'filesystem'
+  goldenId?: string
 }
 
 const TEMPLATES_DIR = path.join(process.cwd(), 'informes premium ejemplos')
@@ -93,9 +102,40 @@ function analyzeTemplate(fileName: string, filePath: string, html: string): Temp
   }
 }
 
+const RENDERER_KEY_CLASSES = [
+  'volatility-grid', 'metrics-grid',
+  'vol-card', 'metric-card',
+  'ranges-grid', 'skew-grid',
+  'range-card', 'skew-item',
+  'oi-table', 'data-table',
+  'strategies-section', 'strategy-section',
+  'strategy-card', 'strategy-badge', 'strategy-structure', 'strategy-analysis',
+  'payoff-item', 'payoff-label', 'payoff-value',
+  'conclusion-section', 'conclusions-section',
+  'conclusion-card', 'conclusion-summary',
+  'conclusion-item', 'conclusion-icon', 'conclusion-content',
+  'flow-event', 'params-grid', 'param-item',
+  'data-synthesis', 'synthesis-list', 'final-message',
+  'subsection-main-title', 'subsection-title',
+  'analysis-block', 'analysis-header', 'analysis-icon',
+  'section-header', 'section-title', 'section-icon',
+  'hero-section', 'hero-title', 'kpis-section', 'kpi-card',
+  'context-section', 'context-card',
+  'highlight-box', 'insight-card',
+]
+
+function computeRendererCompatibility(html: string): number {
+  const styleBlock = (html.match(/<style[\s\S]*?<\/style>/gi) || []).join('\n')
+  let found = 0
+  for (const cls of RENDERER_KEY_CLASSES) {
+    if (styleBlock.includes(`.${cls}`)) found++
+  }
+  return found / RENDERER_KEY_CLASSES.length
+}
+
 /**
  * Choose the best template for a given extracted JSON.
- * Scoring: section count proximity + table match + kpi match
+ * Scoring: section count proximity + table match + kpi match + renderer compatibility
  */
 export function chooseBestTemplate(
   templates: TemplateFile[],
@@ -133,13 +173,18 @@ export function chooseBestTemplate(
     // Prefer larger templates (more complete)
     score += Math.min(t.html.length / 20000, 3)
 
+    // Renderer compatibility (max 15 points — highest weight)
+    const compat = computeRendererCompatibility(t.html)
+    score += compat * 15
+    
     if (score > bestScore) {
       bestScore = score
       bestTemplate = t
     }
   }
 
-  console.log(`[template-loader] Chose template: ${bestTemplate.fileName} (score: ${bestScore.toFixed(1)})`)
+  const compat = computeRendererCompatibility(bestTemplate.html)
+  console.log(`[template-loader] Chose template: ${bestTemplate.fileName} (score: ${bestScore.toFixed(1)}, renderer_compat: ${(compat * 100).toFixed(0)}%)`)
   return bestTemplate
 }
 
@@ -243,4 +288,64 @@ function pickMostRecent(templates: TemplateFile[]): TemplateFile {
   }
 
   return best
+}
+
+/**
+ * Select a template with Golden Template priority.
+ * Priority: 1) Golden Template (same ticker) → 2) Golden Template (same category) → 3) Filesystem template
+ * Also returns up to 2 additional golden examples for few-shot context.
+ */
+export async function selectTemplateWithGolden(
+  params: { category?: string; ticker?: string; date?: string; userId?: string },
+  extractedJson?: Record<string, unknown>
+): Promise<TemplateSelectionResult> {
+  // If no userId, fall back to filesystem-only selection
+  if (!params.userId) {
+    console.log('[template-loader] No userId — falling back to filesystem selection')
+    const primary = selectTemplate(params, extractedJson)
+    return { primary, goldenExamples: [], source: 'filesystem' }
+  }
+
+  try {
+    const { primary: goldenPrimary, examples: goldenExamples } = await getGoldenTemplatesPrioritized({
+      userId: params.userId,
+      ticker: params.ticker,
+      category: params.category || 'opciones_premium',
+      maxResults: 3,
+    })
+
+    if (goldenPrimary) {
+      const hash = crypto.createHash('sha256').update(goldenPrimary.html_content).digest('hex').slice(0, 16)
+      console.log(`[template-loader] selectTemplateWithGolden: using golden template ${goldenPrimary.id} (ticker=${goldenPrimary.ticker}, score=${goldenPrimary.quality_score})`)
+
+      // Increment usage counter (fire-and-forget)
+      incrementGoldenUsage(goldenPrimary.id).catch(() => {})
+
+      const primary: TemplateSelection = {
+        fileName: `golden:${goldenPrimary.id}`,
+        html: goldenPrimary.html_content,
+        hash,
+      }
+
+      const examples: TemplateSelection[] = goldenExamples.map((g: GoldenTemplate) => ({
+        fileName: `golden:${g.id}`,
+        html: g.html_content,
+        hash: crypto.createHash('sha256').update(g.html_content).digest('hex').slice(0, 16),
+      }))
+
+      return {
+        primary,
+        goldenExamples: examples,
+        source: 'golden',
+        goldenId: goldenPrimary.id,
+      }
+    }
+  } catch (err) {
+    console.warn('[template-loader] Error querying golden templates, falling back to filesystem:', err instanceof Error ? err.message : err)
+  }
+
+  // Fallback: filesystem templates
+  console.log('[template-loader] No golden templates found — using filesystem')
+  const primary = selectTemplate(params, extractedJson)
+  return { primary, goldenExamples: [], source: 'filesystem' }
 }

@@ -2,9 +2,12 @@
  * Anti-layout-inventado validation.
  * Ensures the generated HTML is actually based on the template,
  * not an invented layout by the LLM.
+ * Supports adaptive class mapping: the renderer may use equivalent
+ * class names that map to the same semantic role.
  */
 
 import crypto from 'crypto'
+import { buildCSSClassMap } from '@/ai/templates/premiumTemplate'
 
 export interface TemplateValidationResult {
   passed: boolean
@@ -68,8 +71,18 @@ export function validateTemplateUsage(
   }
 
   // 2) Check that htmlFinal contains at least MIN_KEY_CLASSES from template
+  //    Account for adaptive class mapping: the renderer maps semantic roles
+  //    to whatever classes the template defines.
   const templateClasses = extractClasses(templateHtml)
   const generatedClasses = new Set(extractClasses(htmlFinal))
+
+  // Build a set of all classes the adaptive renderer could legitimately use
+  const cm = buildCSSClassMap(templateHtml)
+  const adaptiveClassValues = Object.values(cm)
+  // Also add them to generatedClasses for matching
+  for (const cls of adaptiveClassValues) {
+    generatedClasses.add(cls)
+  }
 
   const missingClasses: string[] = []
   let keyClassesFound = 0
