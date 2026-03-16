@@ -795,7 +795,7 @@ export function renderPremiumHTML(data: StructuredReport, templateHtml: string):
   html += `    <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-container">
-            <a href="https://bostonam.ar/opciones-estandar/" class="back-link">
+            <a href="https://bostonam.ar/informes-de-opciones-premium/" class="back-link">
                 ${ICONS.back}
                 Volver a Opciones
             </a>

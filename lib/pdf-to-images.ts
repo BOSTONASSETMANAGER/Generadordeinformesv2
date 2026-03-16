@@ -3,8 +3,6 @@
  * Converts PDF pages to base64-encoded PNG images for vision API consumption.
  */
 
-import { pdfToPng } from 'pdf-to-png-converter'
-
 export interface PdfPageImage {
   pageNumber: number
   base64: string  // base64-encoded PNG (no data: prefix)
@@ -14,6 +12,8 @@ export interface PdfPageImage {
 
 /**
  * Convert a PDF buffer to an array of base64-encoded PNG page images.
+ * Uses dynamic import for pdf-to-png-converter to avoid module-level crash
+ * on serverless runtimes (Vercel) where native binaries are unavailable.
  * @param pdfBuffer - The PDF file as a Buffer
  * @param options - Optional settings
  * @returns Array of page images with base64 data
@@ -30,6 +30,9 @@ export async function convertPdfToImages(
   const scale = options?.scale ?? 2
 
   console.log(`[pdf-to-images] Converting PDF (${(pdfBuffer.length / 1024).toFixed(0)}KB) to images at scale ${scale}...`)
+
+  // Dynamic import to prevent module-level crash on Vercel serverless
+  const { pdfToPng } = await import('pdf-to-png-converter')
 
   const pages = await pdfToPng(pdfBuffer as unknown as ArrayBuffer, {
     viewportScale: scale,
