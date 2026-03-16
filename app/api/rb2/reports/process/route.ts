@@ -1,25 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase/server'
-import { runPipeline } from '@/lib/pipeline'
-import { MIN_SIMILARITY_SCORE } from '@/lib/template-similarity'
-
-export const maxDuration = 300
 
 /**
- * Async Pipeline: fires the pipeline in the background and returns immediately.
+ * Lightweight dispatcher: validates request, saves PDF, sets status=processing,
+ * then fires the pipeline in a separate serverless function via fetch() (no await).
+ * Returns immediately with { status: 'processing' }.
  * The editor polls /api/rb2/reports/status to pick up results.
- *
- * Flow:
- * 1. Validate request + auth
- * 2. Save PDF source to DB
- * 3. Set report status = 'processing'
- * 4. Fire pipeline in background (no await)
- * 5. Return { status: 'processing' } immediately
- *
- * The background pipeline:
- * - Runs extraction (text-only, fast) → structuring → rendering → validation
- * - Saves extraction, version, and final status to DB
- * - Editor picks up results via polling
  */
 
 export async function POST(request: NextRequest) {
@@ -133,172 +119,47 @@ export async function POST(request: NextRequest) {
     }
 
     // ============================================
-    // RUN PIPELINE (awaited — fast with text-only extraction)
+    // FIRE PIPELINE IN BACKGROUND (separate serverless function)
     // ============================================
-    const textContent = pdfTextContent || ''
     const currentVersion = (report.current_version || 0) + 1
-    const userId = user.id
     const sourceId = sources?.[0]?.id || null
 
-    console.log(`[process] Starting pipeline for report ${reportId}, textContent length=${textContent.length}, hasPdfBase64=${!!pdfBase64}, sourceFileUrl=${sources?.[0]?.file_url ? 'yes' : 'no'}, sourceFileName=${sourceFileName}`)
+    console.log(`[process] Dispatching pipeline for report ${reportId} to /run-pipeline`)
 
-    try {
-      const pipelineResult = await runPipeline(
-        {
-          reportId,
-          userId,
-          sourceFileUrl: sources?.[0]?.file_url || '',
-          sourceFileName,
-          reportName: report.name,
-          pdfBase64: pdfBase64 || undefined,
-        },
-        textContent
-      )
+    // Build the base URL for the internal fetch
+    const protocol = request.headers.get('x-forwarded-proto') || 'https'
+    const host = request.headers.get('host') || 'localhost:3000'
+    const baseUrl = `${protocol}://${host}`
 
-      // Save extraction
-      if (pipelineResult.extractedJson) {
-        const extractedJson = pipelineResult.extractedJson as any
-        const { error: extractionError } = await rb2
-          .from('extractions')
-          .insert({
-            report_id: reportId,
-            source_id: sourceId,
-            user_id: userId,
-            extracted_json: extractedJson,
-            issues: extractedJson.issues || [],
-            needs_review: extractedJson.needs_review || false,
-            validation_issues: pipelineResult.meta.similarity_diagnostics || [],
-          })
-
-        if (extractionError) {
-          console.error('[process] Error saving extraction:', extractionError)
-        } else {
-          console.log(`[process] Extraction saved`)
-        }
-      }
-
-      // Determine final status
-      const similarityScore = pipelineResult.meta.template_similarity_score
-      const templateValidation = pipelineResult.meta.template_validation
-      let finalStatus: string
-      let pipelineErrorMsg: string | null = null
-
-      if (!pipelineResult.success) {
-        finalStatus = 'error'
-        pipelineErrorMsg = (pipelineResult as any).error || pipelineResult.meta.error_message || 'Pipeline returned success=false'
-        console.error(`[process] Pipeline failed: ${pipelineErrorMsg}`)
-      } else if (templateValidation && !templateValidation.passed) {
-        finalStatus = 'error'
-        pipelineErrorMsg = `Template validation failed: ${templateValidation.reasons?.join('; ') || 'unknown'}`
-        console.error(`[process] Template validation FAILED → status=error`)
-      } else if (similarityScore !== null && similarityScore < MIN_SIMILARITY_SCORE) {
-        finalStatus = 'error'
-        pipelineErrorMsg = `Similarity score ${similarityScore} below threshold ${MIN_SIMILARITY_SCORE}`
-        console.warn(`[process] Similarity ${similarityScore} < ${MIN_SIMILARITY_SCORE} → status=error`)
-      } else {
-        finalStatus = 'ready'
-      }
-
-      // Always save a version row (even on error) for diagnosis
-      const hasHtml = pipelineResult.htmlFinal || pipelineResult.extractedJson || (finalStatus === 'error')
-      if (hasHtml) {
-        const versionMeta: Record<string, unknown> = {
-          ...pipelineResult.meta,
-          template_similarity_score: similarityScore,
-          final_status: finalStatus,
-        }
-
-        if (templateValidation && !templateValidation.passed) {
-          versionMeta.change_log = {
-            reason: templateValidation.reasons.join('; '),
-            missing_classes: templateValidation.missingClasses,
-            validation_passed: false,
-          }
-        }
-
-        const { error: versionError } = await rb2
-          .from('report_versions')
-          .insert({
-            report_id: reportId,
-            user_id: userId,
-            version_number: currentVersion,
-            html_content: pipelineResult.htmlFinal || '',
-            report_data: pipelineResult.extractedJson,
-            warnings: pipelineResult.warnings,
-            meta: versionMeta,
-          })
-
-        if (versionError) {
-          console.error('[process] Error saving version:', versionError)
-        } else {
-          console.log(`[process] Version v${currentVersion} saved`)
-        }
-      }
-
-      // Update report status
-      const reportUpdate: Record<string, unknown> = {
-        status: finalStatus,
-        current_version: currentVersion,
-        updated_at: new Date().toISOString(),
-      }
-
-      if (pipelineResult.reportTitle) {
-        reportUpdate.name = pipelineResult.reportTitle
-      }
-
-      await rb2
-        .from('reports')
-        .update(reportUpdate)
-        .eq('id', reportId)
-
-      console.log(`[process] Report ${reportId} → status=${finalStatus}, version=v${currentVersion}`)
-      console.log(`[process] Timings: extract=${pipelineResult.meta.extraction_duration_ms}ms, structure=${pipelineResult.meta.structurer_duration_ms}ms, render=${pipelineResult.meta.render_duration_ms}ms`)
-
-      // Return result — editor polling will pick up the saved results
-      return NextResponse.json({
-        status: finalStatus,
+    // Fire-and-forget: do NOT await this fetch
+    const pipelineSecret = process.env.PIPELINE_INTERNAL_SECRET || process.env.SUPABASE_SERVICE_ROLE_KEY!
+    fetch(`${baseUrl}/api/rb2/reports/run-pipeline`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${pipelineSecret}`,
+      },
+      body: JSON.stringify({
         reportId,
-        success: pipelineResult.success,
-        error: pipelineErrorMsg || undefined,
-      })
+        userId: user.id,
+        sourceFileUrl: sources?.[0]?.file_url || '',
+        sourceFileName,
+        reportName: report.name,
+        pdfBase64: pdfBase64 || undefined,
+        pdfTextContent: pdfTextContent || '',
+        currentVersion,
+        sourceId,
+      }),
+    }).catch(err => {
+      console.error('[process] Failed to dispatch pipeline:', err)
+    })
 
-    } catch (pipelineError) {
-      const errMsg = pipelineError instanceof Error ? pipelineError.message : String(pipelineError)
-      const errStack = pipelineError instanceof Error ? pipelineError.stack : undefined
-      console.error(`[process] Pipeline failed for ${reportId}: ${errMsg}`)
-      if (errStack) console.error(`[process] Stack trace: ${errStack}`)
+    // Return immediately — editor will poll for results
+    return NextResponse.json({
+      status: 'processing',
+      reportId,
+    })
 
-      // Save error details to a version row for remote diagnosis
-      try {
-        await rb2
-          .from('report_versions')
-          .insert({
-            report_id: reportId,
-            user_id: userId,
-            version_number: currentVersion,
-            html_content: '',
-            report_data: {},
-            warnings: [`pipeline_crash: ${errMsg}`],
-            meta: { error_message: errMsg, error_stack: errStack || null, pipeline_crashed: true },
-          })
-      } catch (saveErr) {
-        console.error('[process] Failed to save error version:', saveErr)
-      }
-
-      // Mark report as error in DB
-      await rb2
-        .from('reports')
-        .update({ status: 'error', updated_at: new Date().toISOString() })
-        .eq('id', reportId)
-        .catch((e: any) => console.error('[process] Failed to update error status:', e))
-
-      return NextResponse.json({
-        status: 'error',
-        reportId,
-        success: false,
-        error: errMsg,
-      })
-    }
   } catch (error) {
     console.error('[process] Unhandled error:', error)
     return NextResponse.json(
