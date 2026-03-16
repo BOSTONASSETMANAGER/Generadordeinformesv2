@@ -187,21 +187,26 @@ export async function POST(request: NextRequest) {
       const similarityScore = pipelineResult.meta.template_similarity_score
       const templateValidation = pipelineResult.meta.template_validation
       let finalStatus: string
+      let pipelineErrorMsg: string | null = null
 
       if (!pipelineResult.success) {
         finalStatus = 'error'
+        pipelineErrorMsg = (pipelineResult as any).error || pipelineResult.meta.error_message || 'Pipeline returned success=false'
+        console.error(`[process] Pipeline failed: ${pipelineErrorMsg}`)
       } else if (templateValidation && !templateValidation.passed) {
         finalStatus = 'error'
+        pipelineErrorMsg = `Template validation failed: ${templateValidation.reasons?.join('; ') || 'unknown'}`
         console.error(`[process] Template validation FAILED → status=error`)
       } else if (similarityScore !== null && similarityScore < MIN_SIMILARITY_SCORE) {
         finalStatus = 'error'
+        pipelineErrorMsg = `Similarity score ${similarityScore} below threshold ${MIN_SIMILARITY_SCORE}`
         console.warn(`[process] Similarity ${similarityScore} < ${MIN_SIMILARITY_SCORE} → status=error`)
       } else {
         finalStatus = 'ready'
       }
 
-      // Save version
-      const hasHtml = pipelineResult.htmlFinal || (finalStatus === 'error' && pipelineResult.extractedJson)
+      // Always save a version row (even on error) for diagnosis
+      const hasHtml = pipelineResult.htmlFinal || pipelineResult.extractedJson || (finalStatus === 'error')
       if (hasHtml) {
         const versionMeta: Record<string, unknown> = {
           ...pipelineResult.meta,
@@ -255,11 +260,13 @@ export async function POST(request: NextRequest) {
       console.log(`[process] Report ${reportId} → status=${finalStatus}, version=v${currentVersion}`)
       console.log(`[process] Timings: extract=${pipelineResult.meta.extraction_duration_ms}ms, structure=${pipelineResult.meta.structurer_duration_ms}ms, render=${pipelineResult.meta.render_duration_ms}ms`)
 
-      // Return success — editor polling will pick up the saved results
+      // Return result — editor polling will pick up the saved results
       return NextResponse.json({
         status: finalStatus,
         reportId,
         success: pipelineResult.success,
+        error: pipelineErrorMsg || undefined,
+        _checkpoints: checkpoints,
       })
 
     } catch (pipelineError) {
