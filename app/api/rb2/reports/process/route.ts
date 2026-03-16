@@ -285,10 +285,10 @@ export async function POST(request: NextRequest) {
         console.error('[process] Failed to save error version:', saveErr)
       }
 
-      // Mark report as error in DB
+      // Mark report as error in DB — save error in name for diagnosis
       await rb2
         .from('reports')
-        .update({ status: 'error', updated_at: new Date().toISOString() })
+        .update({ status: 'error', name: `PIPELINE_ERROR: ${errMsg.slice(0, 200)}`, updated_at: new Date().toISOString() })
         .eq('id', reportId)
         .catch((e: any) => console.error('[process] Failed to update error status:', e))
 
@@ -301,9 +301,26 @@ export async function POST(request: NextRequest) {
       })
     }
   } catch (error) {
+    const outerErr = error instanceof Error ? error.message : String(error)
+    const outerStack = error instanceof Error ? error.stack?.slice(0, 300) : undefined
     console.error('[process] Unhandled error:', error)
+    
+    // Try to save error to report row for diagnosis
+    try {
+      const { createServerClient: csc } = await import('@/lib/supabase/server')
+      const s = csc()
+      const r = (s as any).schema('rb2')
+      // Try to find reportId from body if available
+      const bodyText = await request.clone().text().catch(() => '')
+      const bodyMatch = bodyText.match(/"reportId"\s*:\s*"([^"]+)"/)
+      const rId = bodyMatch?.[1]
+      if (rId) {
+        await r.from('reports').update({ status: 'error', name: `OUTER_ERROR: ${outerErr.slice(0, 200)}`, updated_at: new Date().toISOString() }).eq('id', rId)
+      }
+    } catch (_) { /* ignore */ }
+    
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error), _checkpoints: checkpoints },
+      { error: 'Internal server error', details: outerErr, stack: outerStack, _checkpoints: checkpoints },
       { status: 500 }
     )
   }
