@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Plus, FileText, Clock, Loader2, AlertCircle, CheckCircle2, RefreshCw } from "lucide-react"
+import { Plus, FileText, Clock, Loader2, AlertCircle, CheckCircle2, RefreshCw, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -45,6 +45,32 @@ export default function ReportsListPage() {
   useEffect(() => {
     fetchReports()
   }, [])
+
+  const MANUAL_CATEGORIES = ['opciones_estandar', 'instrumentos_dia', 'valor_razonable']
+
+  const getCategoryLabel = (category: string) => {
+    const map: Record<string, { label: string; color: string }> = {
+      opciones_premium: { label: 'Premium', color: 'bg-blue-500/20 text-blue-400' },
+      opciones_estandar: { label: 'Opciones Estándar', color: 'bg-emerald-500/20 text-emerald-400' },
+      instrumentos_dia: { label: 'Instrumentos', color: 'bg-purple-500/20 text-purple-400' },
+      valor_razonable: { label: 'Valor Razonable', color: 'bg-amber-500/20 text-amber-400' },
+    }
+    const info = map[category] || { label: category, color: 'bg-gray-500/20 text-gray-400' }
+    return (
+      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${info.color}`}>
+        {info.label}
+      </span>
+    )
+  }
+
+  const handleReportClick = (report: Report) => {
+    if (MANUAL_CATEGORIES.includes(report.category)) {
+      const params = new URLSearchParams({ category: report.category, id: report.id })
+      router.push(`/app/reports/new/form?${params.toString()}`)
+    } else {
+      router.push(`/app/reports/${report.id}/editor`)
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -132,15 +158,21 @@ export default function ReportsListPage() {
               <Card 
                 key={report.id}
                 className="p-4 hover:border-saas-accent/50 cursor-pointer transition-colors"
-                onClick={() => router.push(`/app/reports/${report.id}/editor`)}
+                onClick={() => handleReportClick(report)}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="icon-container">
-                      <FileText className="w-5 h-5 text-saas-accent" />
+                      {MANUAL_CATEGORIES.includes(report.category)
+                        ? <Pencil className="w-5 h-5 text-saas-accent" />
+                        : <FileText className="w-5 h-5 text-saas-accent" />
+                      }
                     </div>
                     <div>
-                      <h3 className="font-medium text-saas-light">{report.name}</h3>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium text-saas-light">{report.name}</h3>
+                        {getCategoryLabel(report.category)}
+                      </div>
                       <div className="flex items-center gap-2 text-xs text-saas-muted mt-1">
                         <Clock className="w-3 h-3" />
                         {formatDate(report.updated_at)}

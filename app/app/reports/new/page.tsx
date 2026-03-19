@@ -2,12 +2,12 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { BarChart3, TrendingUp, Activity, ArrowRight, ArrowLeft, Check } from "lucide-react"
+import { BarChart3, TrendingUp, ArrowRight, ArrowLeft, Check, DollarSign, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Breadcrumbs } from "@/components/dashboard/Breadcrumbs"
 
-type ReportCategory = 'opciones_premium' | 'resumen_semanal' | 'analisis_diario'
+type ReportCategory = 'opciones_premium' | 'opciones_estandar' | 'instrumentos_dia' | 'valor_razonable'
 
 interface CategoryOption {
   id: ReportCategory
@@ -17,27 +17,36 @@ interface CategoryOption {
   enabled: boolean
 }
 
+const MANUAL_CATEGORIES: ReportCategory[] = ['opciones_estandar', 'instrumentos_dia', 'valor_razonable']
+
 const categories: CategoryOption[] = [
   {
     id: 'opciones_premium',
     title: 'Informe de Opciones Premium',
-    description: 'Análisis profundo de derivados, incluyendo Griegas, ranking de IV y spreads estratégicos.',
+    description: 'Análisis profundo de derivados con AI pipeline: Griegas, ranking de IV y spreads estratégicos.',
     icon: <BarChart3 className="w-8 h-8" />,
     enabled: true,
   },
   {
-    id: 'resumen_semanal',
-    title: 'Resumen Semanal de Mercado',
-    description: 'Revisión exhaustiva de las últimas 5 sesiones de negociación y próximos catalizadores económicos.',
+    id: 'opciones_estandar',
+    title: 'Opciones Estándar',
+    description: 'Informe manual de derivados con tablas de calls/puts, imanes de precio y volatilidad histórica.',
     icon: <TrendingUp className="w-8 h-8" />,
-    enabled: false,
+    enabled: true,
   },
   {
-    id: 'analisis_diario',
-    title: 'Análisis Diario',
-    description: 'Instantánea rápida de precios actuales de mercado, líderes de volumen e indicadores técnicos.',
-    icon: <Activity className="w-8 h-8" />,
-    enabled: false,
+    id: 'instrumentos_dia',
+    title: 'Instrumentos del Día',
+    description: 'Análisis de CEDEAR/acción con contenido estándar y premium. Genera 2 bloques HTML independientes.',
+    icon: <Star className="w-8 h-8" />,
+    enabled: true,
+  },
+  {
+    id: 'valor_razonable',
+    title: 'Valor Razonable',
+    description: 'Informe semanal de valor razonable para acciones argentinas y del NYSE.',
+    icon: <DollarSign className="w-8 h-8" />,
+    enabled: true,
   },
 ]
 
@@ -46,7 +55,10 @@ export default function NewReportPage() {
   const [selectedCategory, setSelectedCategory] = useState<ReportCategory | null>('opciones_premium')
 
   const handleContinue = () => {
-    if (selectedCategory) {
+    if (!selectedCategory) return
+    if (MANUAL_CATEGORIES.includes(selectedCategory)) {
+      router.push(`/app/reports/new/form?category=${selectedCategory}`)
+    } else {
       router.push(`/app/reports/new/upload?category=${selectedCategory}`)
     }
   }
@@ -91,7 +103,7 @@ export default function NewReportPage() {
           </div>
 
           {/* Category Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
             {categories.map((category) => (
               <Card
                 key={category.id}
