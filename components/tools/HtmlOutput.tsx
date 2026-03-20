@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect, useCallback } from "react"
-import { Check, Copy, Code, Eye } from "lucide-react"
+import { Check, Copy, Eye, Zap } from "lucide-react"
 
 interface HtmlBlock {
   label: string
@@ -10,22 +10,22 @@ interface HtmlBlock {
 
 interface HtmlOutputProps {
   blocks: HtmlBlock[]
+  onRegenerate?: () => void
 }
 
-export function HtmlOutput({ blocks }: HtmlOutputProps) {
+export function HtmlOutput({ blocks, onRegenerate }: HtmlOutputProps) {
   if (blocks.length === 0 || blocks.every(b => !b.html)) return null
 
   return (
     <div className="space-y-6">
       {blocks.filter(b => b.html).map((block, idx) => (
-        <HtmlBlockView key={idx} block={block} />
+        <HtmlBlockView key={idx} block={block} onRegenerate={onRegenerate} />
       ))}
     </div>
   )
 }
 
-function HtmlBlockView({ block }: { block: HtmlBlock }) {
-  const [tab, setTab] = useState<'preview' | 'code'>('preview')
+function HtmlBlockView({ block, onRegenerate }: { block: HtmlBlock; onRegenerate?: () => void }) {
   const [copied, setCopied] = useState(false)
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
@@ -44,7 +44,7 @@ function HtmlBlockView({ block }: { block: HtmlBlock }) {
   }, [])
 
   useEffect(() => {
-    if (tab !== 'preview' || !block.html) return
+    if (!block.html) return
     const iframe = iframeRef.current
     if (!iframe) return
 
@@ -56,7 +56,7 @@ function HtmlBlockView({ block }: { block: HtmlBlock }) {
 
     const timer = setTimeout(adjustIframeHeight, 200)
     return () => clearTimeout(timer)
-  }, [tab, block.html, adjustIframeHeight])
+  }, [block.html, adjustIframeHeight])
 
   const handleCopy = async () => {
     try {
@@ -81,61 +81,17 @@ function HtmlBlockView({ block }: { block: HtmlBlock }) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--dashboard-border)] bg-[var(--dashboard-surface-elevated)]">
         <span className="text-sm font-semibold text-[var(--saas-light)]">{block.label}</span>
-        <div className="flex items-center gap-2">
-          {/* Tabs */}
-          <div className="flex rounded-lg overflow-hidden border border-[var(--dashboard-border)]">
-            <button
-              onClick={() => setTab('preview')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
-                tab === 'preview'
-                  ? 'bg-[var(--saas-accent)] text-white'
-                  : 'bg-[var(--dashboard-surface)] text-[var(--saas-muted)] hover:text-[var(--saas-light)]'
-              }`}
-            >
-              <Eye className="w-3.5 h-3.5" />
-              Vista Previa
-            </button>
-            <button
-              onClick={() => setTab('code')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors ${
-                tab === 'code'
-                  ? 'bg-[var(--saas-accent)] text-white'
-                  : 'bg-[var(--dashboard-surface)] text-[var(--saas-muted)] hover:text-[var(--saas-light)]'
-              }`}
-            >
-              <Code className="w-3.5 h-3.5" />
-              Código HTML
-            </button>
-          </div>
-          {/* Copy button */}
-          <button
-            onClick={handleCopy}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              copied
-                ? 'bg-[var(--saas-success)] text-white'
-                : 'bg-[var(--saas-accent)] text-white hover:opacity-90'
-            }`}
-          >
-            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-            {copied ? 'Copiado' : 'Copiar HTML'}
-          </button>
-        </div>
+        <span />
       </div>
 
-      {/* Content */}
+      {/* Content — always preview */}
       <div className="p-0">
-        {tab === 'preview' ? (
-          <iframe
-            ref={iframeRef}
-            className="w-full border-0 bg-white rounded-b-xl"
-            style={{ minHeight: '200px' }}
-            title={block.label}
-          />
-        ) : (
-          <pre className="p-4 text-xs text-green-400 bg-[#0d1117] overflow-auto max-h-[600px] font-mono leading-relaxed">
-            <code>{block.html}</code>
-          </pre>
-        )}
+        <iframe
+          ref={iframeRef}
+          className="w-full border-0 bg-white rounded-b-xl"
+          style={{ minHeight: '200px' }}
+          title={block.label}
+        />
       </div>
     </div>
   )

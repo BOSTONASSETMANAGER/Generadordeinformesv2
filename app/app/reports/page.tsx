@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Plus, FileText, Clock, Loader2, AlertCircle, CheckCircle2, RefreshCw, Pencil } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Breadcrumbs } from "@/components/dashboard/Breadcrumbs"
+import { UserAvatar } from "@/components/dashboard/UserAvatar"
 
 interface Report {
   id: string
@@ -118,10 +118,13 @@ export default function ReportsListPage() {
               <h1 className="text-xl font-bold text-saas-light">Mis Informes</h1>
               <p className="text-sm text-saas-muted">Gestiona y crea nuevos informes financieros</p>
             </div>
-            <Button onClick={() => router.push('/app/reports/new')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Nuevo Informe
-            </Button>
+            <div className="flex items-center gap-3">
+              <button onClick={() => router.push('/app/reports/new')} className="btn-cta">
+                <Plus className="w-4 h-4" />
+                Nuevo Informe
+              </button>
+              <UserAvatar />
+            </div>
           </div>
         </div>
       </header>
@@ -137,20 +140,20 @@ export default function ReportsListPage() {
           <div className="flex flex-col items-center justify-center py-20 text-saas-muted">
             <AlertCircle className="w-8 h-8 mb-4 text-red-400" />
             <p className="text-red-400 mb-4">{error}</p>
-            <Button variant="outline" onClick={fetchReports}>
-              <RefreshCw className="w-4 h-4 mr-2" />
+            <button onClick={fetchReports} className="btn-cta-secondary">
+              <RefreshCw className="w-4 h-4" />
               Reintentar
-            </Button>
+            </button>
           </div>
         ) : reports.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-saas-muted">
             <FileText className="w-12 h-12 mb-4 opacity-30" />
             <p className="text-lg mb-2">No tenés informes todavía</p>
             <p className="text-sm mb-6">Creá tu primer informe financiero</p>
-            <Button onClick={() => router.push('/app/reports/new')}>
-              <Plus className="w-4 h-4 mr-2" />
+            <button onClick={() => router.push('/app/reports/new')} className="btn-cta">
+              <Plus className="w-4 h-4" />
               Nuevo Informe
-            </Button>
+            </button>
           </div>
         ) : (
           <div className="grid gap-4">

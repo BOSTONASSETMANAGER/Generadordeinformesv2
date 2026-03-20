@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { BarChart3, TrendingUp, ArrowRight, ArrowLeft, Check, DollarSign, Star } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Breadcrumbs } from "@/components/dashboard/Breadcrumbs"
 
@@ -153,17 +152,18 @@ export default function NewReportPage() {
 
           {/* Actions */}
           <div className="flex items-center justify-between pt-6 border-t border-[var(--dashboard-border)]">
-            <Button variant="ghost" onClick={handleCancel}>
-              <ArrowLeft className="w-4 h-4 mr-2" />
+            <button onClick={handleCancel} className="btn-cta-secondary">
+              <ArrowLeft className="w-4 h-4" />
               Cancelar y Salir
-            </Button>
-            <Button 
+            </button>
+            <button
               onClick={handleContinue}
               disabled={!selectedCategory}
+              className="btn-cta"
             >
               Continuar
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       </main>
