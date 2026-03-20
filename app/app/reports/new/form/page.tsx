@@ -83,6 +83,7 @@ function FormPageInner() {
   const [loadingEdit, setLoadingEdit] = useState(!!editId)
   const [copied, setCopied] = useState(false)
   const [copiedAll, setCopiedAll] = useState(false)
+  const [copiedBlock, setCopiedBlock] = useState<number | null>(null)
 
   // Fetch form_data when editing an existing report
   useEffect(() => {
@@ -149,6 +150,25 @@ function FormPageInner() {
         setCopied(true)
         setTimeout(() => setCopied(false), 2500)
       }
+    }
+  }
+
+  const handleCopyBlock = async (index: number) => {
+    const html = htmlBlocks[index]?.html
+    if (!html) return
+    try {
+      await navigator.clipboard.writeText(html)
+      setCopiedBlock(index)
+      setTimeout(() => setCopiedBlock(null), 2500)
+    } catch {
+      const textarea = document.createElement('textarea')
+      textarea.value = html
+      document.body.appendChild(textarea)
+      textarea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textarea)
+      setCopiedBlock(index)
+      setTimeout(() => setCopiedBlock(null), 2500)
     }
   }
 
@@ -260,11 +280,24 @@ function FormPageInner() {
                     <Eye className="w-3.5 h-3.5" />
                     Vista Previa
                   </span>
-                  {/* Copy HTML */}
-                  <button onClick={handleCopyAll} className="btn-cta">
-                    {copiedAll ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    {copiedAll ? 'Copiado' : 'Copiar HTML'}
-                  </button>
+                  {/* Copy HTML — per-block for instrumentos, single for others */}
+                  {category === 'instrumentos_dia' && htmlBlocks.length >= 2 ? (
+                    <>
+                      <button onClick={() => handleCopyBlock(0)} className="btn-cta">
+                        {copiedBlock === 0 ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        {copiedBlock === 0 ? 'Copiado' : 'Copiar Estándar'}
+                      </button>
+                      <button onClick={() => handleCopyBlock(1)} className="btn-cta">
+                        {copiedBlock === 1 ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        {copiedBlock === 1 ? 'Copiado' : 'Copiar Premium'}
+                      </button>
+                    </>
+                  ) : (
+                    <button onClick={handleCopyAll} className="btn-cta">
+                      {copiedAll ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copiedAll ? 'Copiado' : 'Copiar HTML'}
+                    </button>
+                  )}
                 </>
               ) : (
                 <button onClick={handleGenerate} className="btn-cta">
