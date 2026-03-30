@@ -40,7 +40,7 @@ body { overflow-x: hidden; }
 /* ─── Hero ─── */
 .{{ROOT}} .hero-section {
     background: linear-gradient(135deg, var(--saas-primary) 0%, var(--saas-accent) 100%);
-    padding: 60px 0 50px; width: 100vw; margin-left: calc(-50vw + 50%); margin-top: -60px; color: white;
+    padding: 60px 0 50px; width: 100vw; margin-left: calc(-50vw + 50%); margin-top: -100px; color: white;
 }
 .{{ROOT}} .hero-container { max-width: 1200px; margin: 0 auto; padding: 0 30px; }
 .{{ROOT}} .back-link { display: inline-flex; align-items: center; gap: 8px; color: rgba(255,255,255,0.9); text-decoration: none; font-size: 0.9rem; font-weight: 500; margin-bottom: 20px; transition: all 0.2s ease; }
