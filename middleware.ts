@@ -9,6 +9,15 @@ const PUBLIC_PATHS = [
   '/auth/callback',
 ]
 
+/**
+ * Internal API routes that handle their own authentication (e.g. Bearer secret).
+ * These must bypass middleware cookie-based auth because they are called
+ * server-to-server without browser cookies.
+ */
+const INTERNAL_API_PATHS = [
+  '/api/rb2/reports/run-pipeline',
+]
+
 const IGNORED_PREFIXES = [
   '/_next',
   '/favicon.ico',
@@ -25,6 +34,11 @@ function isPublicPath(pathname: string): boolean {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+
+  // Skip internal API routes (they handle their own Bearer token auth)
+  if (INTERNAL_API_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+    return NextResponse.next()
+  }
 
   // Skip public / static paths
   if (isPublicPath(pathname)) {
